@@ -34,7 +34,7 @@ class AuthController extends AbstractController
         return $this->json(['success' => false, 'message' => $message], $status);
     }
 
-    #[Route('/api/form/registration', methods: ['POST'])]
+    #[Route('/api/registration', methods: ['POST'])]
     public function createUser(Request $request): JsonResponse
     {
         try {
@@ -73,25 +73,6 @@ class AuthController extends AbstractController
             'user'  => $user->getUserIdentifier(),
             'token' => $token,
         ]);
-
-
-        // try {
-        //     $data = $request->getPayload();
-        //     $user = $this->usersManager->checkUserCredentials(
-        //         $data->get('email'),
-        //         $data->get('password')
-        //     );
-
-        //     if($user != null)
-        //         return $this->successResponse([
-        //             'message' => 'User logged successfully',
-        //             'userId' => $user->getId()
-        //         ], 201);
-        //     else
-        //         return $this->errorResponse('Error authenticating: wrong credentials');
-        // } catch (\Exception $e) {
-        //     return $this->errorResponse('Error creating account: ' . $e->getMessage());
-        // }
     }
 
 }
