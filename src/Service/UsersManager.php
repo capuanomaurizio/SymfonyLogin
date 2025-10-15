@@ -4,11 +4,14 @@ namespace App\Service;
 
 use App\Document\User;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+
 
 class UsersManager
 {
     public function __construct(
-        private DocumentManager $documentManager
+        private DocumentManager $documentManager,
+        private UserPasswordHasherInterface $passwordHasher
     ) {}
 
     public function createUser(string $name, string $surname, string $email, string $password): ?User
@@ -17,10 +20,14 @@ class UsersManager
         $existingUser = $this->findUserByEmail($email);
         if($existingUser == null){
             $user = new User(); 
+            $hashedPassword = $this->passwordHasher->hashPassword(
+                $user,
+                $password
+            );
             $user->setName($name)
                     ->setSurname($surname)
                     ->setEmail($email)
-                    ->setPassword($password);
+                    ->setPassword($hashedPassword);
 
             $this->documentManager->persist($user);
             $this->documentManager->flush();
@@ -36,8 +43,14 @@ class UsersManager
 
     public function checkUserCredentials(string $email, string $password): ?User
     {
-        return $this->documentManager->getRepository(User::class)
-            ->findOneBy(['email' => $email, 'password' => $password]);
+        $user = null;
+        $existingUser = $this->findUserByEmail($email);
+        if($existingUser != null){
+            $user = $this->findUserByEmail($email);
+            if (!$this->passwordHasher->isPasswordValid($user, $password))
+                $user = null;
+        }
+        return $user;
     }
 
 }

@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+
 class AuthController extends AbstractController
 {
     public function __construct(
@@ -45,11 +46,12 @@ class AuthController extends AbstractController
                 $data->get('password')
             );
 
-            if($user != null)
+            if($user != null){
                 return $this->successResponse([
                     'message' => 'User created successfully',
                     'userId' => $user->getId()
                 ], 201);
+            }
             else
                 return $this->errorResponse('Error creating account: the user already exists');
         } catch (\Exception $e) {
@@ -69,7 +71,7 @@ class AuthController extends AbstractController
 
             if($user != null)
                 return $this->successResponse([
-                    'message' => 'User created successfully',
+                    'message' => 'User logged successfully',
                     'userId' => $user->getId()
                 ], 201);
             else
