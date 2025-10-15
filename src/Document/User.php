@@ -3,9 +3,11 @@
 namespace App\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ODM\Document(collection: 'users')]
-class User
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ODM\Id]
     private ?string $id = null;
@@ -22,12 +24,20 @@ class User
     #[ODM\Field(type: 'string')]
     private string $password;
 
+    #[ODM\Field(type: 'collection')]
+    private array $roles = [];
+
     #[ODM\Field(type: 'date')]
     private \DateTime $createdAt;
 
     public function __construct()
     {
         $this->createdAt = new \DateTime();
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->email;
     }
 
     // Getters
@@ -54,6 +64,15 @@ class User
     public function getPassword(): string 
     { 
         return $this->password; 
+    }
+
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
     }
     
     public function getCreatedAt(): \DateTime 
@@ -85,10 +104,23 @@ class User
         $this->password = $password; 
         return $this; 
     }
+
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
     
     public function setCreatedAt(\DateTime $createdAt): self 
     { 
         $this->createdAt = $createdAt; 
         return $this; 
+    }
+
+    public function eraseCredentials(): void
+    {
+        // If you store any temporary, sensitive data on the user, clear it here
+        // For example: $this->plainPassword = null;
     }
 }
