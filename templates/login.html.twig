@@ -170,7 +170,7 @@
         </div>
     </div>
     <script>
-        const API_BASE = '/api/form';
+        const API_BASE = '/api';
 
         async function makeRequest(url, options = {}) {
             try {
@@ -193,6 +193,7 @@
             element.style.display = 'block';
             element.className = `result ${result.success ? 'success' : 'error'}`;
             element.textContent = JSON.stringify(result.data, null, 2);
+            console.log(JSON.stringify(result.data, null, 2));
         }
 
         // Create Account
@@ -217,7 +218,7 @@
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = {
-                email: document.getElementById('loginEmail').value,
+                username: document.getElementById('loginEmail').value,
                 password: document.getElementById('loginPassword').value
             };
 
@@ -226,6 +227,7 @@
                 body: JSON.stringify(formData)
             });
 
+            console.log(result.data);
             showResult('authenticationResult', result);
         });
     </script>

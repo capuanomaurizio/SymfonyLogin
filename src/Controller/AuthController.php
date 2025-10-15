@@ -4,12 +4,13 @@ namespace App\Controller;
 
 use App\Service\UsersManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-
+use Doctrine\ODM\MongoDB\DocumentManager;
+use App\Document\User;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 class AuthController extends AbstractController
 {
@@ -18,10 +19,9 @@ class AuthController extends AbstractController
     ) {}
 
     #[Route('/', name: 'homepage')]
-    public function homepage(#[Autowire(param: 'kernel.project_dir')] string $projectDir): Response
+    public function homepage(): Response
     {
-        $html = file_get_contents($projectDir . '/public/index.html');
-        return new Response($html, status: 200, headers: ['Content-Type' => 'text/html']);
+        return $this->render("login.html.twig");
     }
 
     private function successResponse($data, int $status = 200): JsonResponse
@@ -59,26 +59,39 @@ class AuthController extends AbstractController
         }
     }
 
-    #[Route('/api/form/login', methods: ['POST'])]
-    public function loginUser(Request $request): JsonResponse
+    #[Route('/api/login', name: 'api_login', methods: ['POST'])]
+    public function loginUser(#[CurrentUser] ?User $user): Response
     {
-        try {
-            $data = $request->getPayload();
-            $user = $this->usersManager->checkUserCredentials(
-                $data->get('email'),
-                $data->get('password')
-            );
-
-            if($user != null)
-                return $this->successResponse([
-                    'message' => 'User logged successfully',
-                    'userId' => $user->getId()
-                ], 201);
-            else
-                return $this->errorResponse('Error authenticating: wrong credentials');
-        } catch (\Exception $e) {
-            return $this->errorResponse('Error creating account: ' . $e->getMessage());
+        if (null === $user) {
+            return $this->json([
+                'message' => 'missing credentials',
+            ], Response::HTTP_UNAUTHORIZED);
         }
+
+        $token = "tokenexample"; // somehow create an API token for $user
+        return $this->json([
+            'user'  => $user->getUserIdentifier(),
+            'token' => $token,
+        ]);
+
+
+        // try {
+        //     $data = $request->getPayload();
+        //     $user = $this->usersManager->checkUserCredentials(
+        //         $data->get('email'),
+        //         $data->get('password')
+        //     );
+
+        //     if($user != null)
+        //         return $this->successResponse([
+        //             'message' => 'User logged successfully',
+        //             'userId' => $user->getId()
+        //         ], 201);
+        //     else
+        //         return $this->errorResponse('Error authenticating: wrong credentials');
+        // } catch (\Exception $e) {
+        //     return $this->errorResponse('Error creating account: ' . $e->getMessage());
+        // }
     }
 
 }
