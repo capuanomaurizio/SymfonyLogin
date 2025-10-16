@@ -206,7 +206,7 @@
                 password: document.getElementById('password').value
             };
 
-            const result = await makeRequest(`${API_BASE}/registration`, {
+            const result = await makeRequest(`${API_BASE}/registration`, { // Changed from /registration
                 method: 'POST',
                 body: JSON.stringify(formData)
             });
