@@ -16,30 +16,56 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 class AuthController extends AbstractController
 {
     public function __construct(
-        private readonly DocumentManager $documentManager,
-        private readonly UserPasswordHasherInterface $passwordHasher,
+        private readonly DocumentManager $documentManager
     ) {}
 
     #[Route('/', name: 'index')]
     public function index(): Response
     {
-        return $this->render("base.html.twig");
+        return $this->render("login.html.twig");
     }
 
     #[Route('/homepage', name: 'homepage')]
     public function homepage(): Response
     {
         $user = $this->getUser();
-        if (!$user) {
+        if (!$user)
             return $this->redirectToRoute('index');
-        }
         return $this->render("homepage.html.twig", ["user" => $user]);
+    }
+
+    #[Route('/userslist', name: 'users_list')]
+    public function usersList(): Response
+    {
+        return $this->render("users-list.html.twig");
+    }
+
+    #[Route('/api/userslist', name: 'api_users_list', methods: ['POST'])]
+    public function getUsersList(): false|JsonResponse
+    {
+        $users = $this->documentManager->getRepository(User::class)->findAll();
+        return $this->json($users);
+    }
+
+    #[Route('/api/changeUserStatus', methods: ['POST'])]
+    public function changeUserStatus(Request $request): Response
+    {
+        $data = $request->getPayload();
+        $user = $this->documentManager->getRepository(User::class)
+                ->findOneBy(['email' => $data->get('email')]);
+        if($user->isEnabled())
+            $user->setEnabled(false);
+        else
+            $user->setEnabled(true);
+        $this->documentManager->persist($user);
+        $this->documentManager->flush();
+        return $this->json($user);
     }
 
     #[Route('/api/registration', methods: ['POST'])]
     public function createUser(
         Request $request,
-
+        UserPasswordHasherInterface $passwordHasher,
         Security $security
     ): JsonResponse {
         try {
@@ -48,7 +74,7 @@ class AuthController extends AbstractController
             if($this->documentManager->getRepository(User::class)
                     ->findOneBy(['email' => $data->get('email')]) == null){
                 $user = new User();
-                $hashedPassword = $this->passwordHasher->hashPassword(
+                $hashedPassword = $passwordHasher->hashPassword(
                     $user,
                     $data->get('plainPassword')
                 );
@@ -63,7 +89,7 @@ class AuthController extends AbstractController
             if($user != null){
                 $security->login($user);
                 return $this->json([
-                    'message' => 'User created successfully',
+                    'message' => 'Utente creato correttamente',
                     'user' => $user->getUserIdentifier(),
                     'redirect' => $this->generateUrl('homepage')
                 ], 201);
@@ -80,7 +106,7 @@ class AuthController extends AbstractController
     {
         if ($user === null) {
             return $this->json([
-                'message' => 'missing credentials',
+                'message' => 'Credenziali mancanti',
             ], Response::HTTP_UNAUTHORIZED);
         }
 

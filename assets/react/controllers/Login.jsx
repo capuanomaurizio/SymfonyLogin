@@ -1,8 +1,8 @@
-import './App.css'
+import './Login.css'
 import {Form, Input, Button, Flex, Card, message} from 'antd'
 import {useRef} from "react";
 
-function App() {
+function Login() {
 
     const registrationFormRef = useRef(null)
     const loginFormRef = useRef(null)
@@ -54,36 +54,36 @@ function App() {
   return (
     <Flex className="container" vertical>
       <div className="header">
-        <h1>Symfony registration and login form</h1>
+        <h1>Form di registrazione e login con Symfony</h1>
         <p>Esercizio di connessione e comunicazione con database Mongo sfruttando il PHP framework "Symfony"</p>
       </div>
       <Flex className='flexBox'  align='center'>
         <Flex className='formFlex' justify='center' align='flex-start'>
-          <Card className='formCard' title="Register user" hoverable>
+          <Card className='formCard' title="Registra utente" hoverable>
             <Form ref={registrationFormRef}>
-              <Form.Item label="User Name" name="name">
-                <Input placeholder='User name' />
+              <Form.Item label="Nome" name="name">
+                <Input placeholder='Nome utente' />
               </Form.Item>
-              <Form.Item label="User Surname" name="surname">
-                <Input placeholder='User surname' />
+              <Form.Item label="Cognome" name="surname">
+                <Input placeholder='Cognome utente' />
               </Form.Item>
-              <Form.Item label="User Email" name="email">
-                <Input placeholder='Email' />
+              <Form.Item label="Email" name="email">
+                <Input type="email" placeholder='Email' />
               </Form.Item>
               <Form.Item label="Password" name="plainPassword">
                 <Input.Password placeholder='Password' />
               </Form.Item>
               <Form.Item>
-                <Button block type='primary' onClick={handleRegister}>Register user</Button>
+                <Button block type='primary' onClick={handleRegister}>Registrati</Button>
               </Form.Item>
             </Form>
           </Card>
         </Flex>
         <Flex className='formFlex' justify='center' align='flex-start'>
-          <Card className='formCard' title="Login" hoverable>
+          <Card className='formCard' title="Login utente" hoverable>
             <Form ref={loginFormRef}>
-              <Form.Item label="User Email" name="username">
-                <Input placeholder='Email' />
+              <Form.Item label="Email" name="username">
+                <Input type="email" placeholder='Email' />
               </Form.Item>
               <Form.Item label="Password" name="password">
                 <Input.Password placeholder='Password' />
@@ -99,4 +99,4 @@ function App() {
   )
 }
 
-export default App;
+export default Login;

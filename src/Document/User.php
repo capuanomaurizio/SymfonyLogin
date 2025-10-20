@@ -30,6 +30,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ODM\Field(type: 'date')]
     private \DateTime $createdAt;
 
+    #[ODM\Field(type: 'boolean')]
+    private bool $enabled;
+
     public function __construct()
     {
         $this->createdAt = new \DateTime();
@@ -41,29 +44,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     // Getters
-    public function getId(): ?string 
-    { 
-        return $this->id; 
+    public function getId(): ?string
+    {
+        return $this->id;
     }
-    
-    public function getName(): string 
-    { 
-        return $this->name; 
+
+    public function getName(): string
+    {
+        return $this->name;
     }
-    
-    public function getSurname(): string 
-    { 
-        return $this->surname; 
+
+    public function getSurname(): string
+    {
+        return $this->surname;
     }
-    
-    public function getEmail(): string 
-    { 
-        return $this->email; 
+
+    public function getEmail(): string
+    {
+        return $this->email;
     }
-    
-    public function getPassword(): string 
-    { 
-        return $this->password; 
+
+    public function getPassword(): string
+    {
+        return $this->password;
     }
 
     public function getRoles(): array
@@ -74,35 +77,40 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return array_unique($roles);
     }
-    
-    public function getCreatedAt(): \DateTime 
-    { 
-        return $this->createdAt; 
+
+    public function getCreatedAt(): \DateTime
+    {
+        return $this->createdAt;
+    }
+
+    public function isEnabled(): bool
+    {
+        return $this->enabled;
     }
 
     // Setters
-    public function setName(string $name): self 
-    { 
-        $this->name = $name; 
-        return $this; 
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+        return $this;
     }
-    
-    public function setSurname(string $surname): self 
-    { 
-        $this->surname = $surname; 
-        return $this; 
+
+    public function setSurname(string $surname): self
+    {
+        $this->surname = $surname;
+        return $this;
     }
-    
-    public function setEmail(string $email): self 
-    { 
-        $this->email = $email; 
-        return $this; 
+
+    public function setEmail(string $email): self
+    {
+        $this->email = $email;
+        return $this;
     }
-    
-    public function setPassword(string $password): self 
-    { 
-        $this->password = $password; 
-        return $this; 
+
+    public function setPassword(string $password): self
+    {
+        $this->password = $password;
+        return $this;
     }
 
     public function setRoles(array $roles): self
@@ -111,11 +119,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
-    
-    public function setCreatedAt(\DateTime $createdAt): self 
-    { 
-        $this->createdAt = $createdAt; 
-        return $this; 
+
+    public function setCreatedAt(\DateTime $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
+
+    public function setEnabled(bool $enabled): void
+    {
+        $this->enabled = $enabled;
     }
 
     public function eraseCredentials(): void
