@@ -2,20 +2,21 @@
 
 namespace App\Controller;
 
-use App\Service\UsersManager;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
-use Doctrine\ODM\MongoDB\DocumentManager;
 use App\Document\User;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 class AuthController extends AbstractController
 {
     public function __construct(
-        private UsersManager $usersManager
+        private readonly DocumentManager $documentManager,
+        private readonly UserPasswordHasherInterface $passwordHasher
     ) {}
 
     #[Route('/', name: 'homepage')]
@@ -39,13 +40,22 @@ class AuthController extends AbstractController
     {
         try {
             $data = $request->getPayload();
-            $user = $this->usersManager->createUser(
-                $data->get('name'),
-                $data->get('surname'),
-                $data->get('email'),
-                $data->get('password')
-            );
+            $user = null;
+            if($this->documentManager->getRepository(User::class)
+                    ->findOneBy(['email' => $data->get('email')]) == null){
+                $user = new User();
+                $hashedPassword = $this->passwordHasher->hashPassword(
+                    $user,
+                    $data->get('password')
+                );
+                $user->setName($data->get('name'))
+                    ->setSurname($data->get('surname'))
+                    ->setEmail($data->get('email'))
+                    ->setPassword($hashedPassword);
 
+                $this->documentManager->persist($user);
+                $this->documentManager->flush();
+            }
             if($user != null){
                 return $this->successResponse([
                     'message' => 'User created successfully',
@@ -53,7 +63,7 @@ class AuthController extends AbstractController
                 ], 201);
             }
             else
-                return $this->errorResponse('Error creating account: the user already exists');
+                return $this->errorResponse('Error creating account: the user already exists', 401);
         } catch (\Exception $e) {
             return $this->errorResponse('Error creating account: ' . $e->getMessage());
         }
