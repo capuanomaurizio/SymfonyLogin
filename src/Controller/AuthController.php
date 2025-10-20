@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,28 +17,31 @@ class AuthController extends AbstractController
 {
     public function __construct(
         private readonly DocumentManager $documentManager,
-        private readonly UserPasswordHasherInterface $passwordHasher
+        private readonly UserPasswordHasherInterface $passwordHasher,
     ) {}
 
-    #[Route('/', name: 'homepage')]
+    #[Route('/', name: 'index')]
+    public function index(): Response
+    {
+        return $this->render("base.html.twig");
+    }
+
+    #[Route('/homepage', name: 'homepage')]
     public function homepage(): Response
     {
-        return $this->render("login.html.twig");
-    }
-
-    private function successResponse($data, int $status = 200): JsonResponse
-    {
-        return $this->json(['success' => true, ...$data], $status);
-    }
-
-    private function errorResponse(string $message, int $status = 400): JsonResponse
-    {
-        return $this->json(['success' => false, 'message' => $message], $status);
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('index');
+        }
+        return $this->render("homepage.html.twig", ["user" => $user]);
     }
 
     #[Route('/api/registration', methods: ['POST'])]
-    public function createUser(Request $request): JsonResponse
-    {
+    public function createUser(
+        Request $request,
+
+        Security $security
+    ): JsonResponse {
         try {
             $data = $request->getPayload();
             $user = null;
@@ -46,7 +50,7 @@ class AuthController extends AbstractController
                 $user = new User();
                 $hashedPassword = $this->passwordHasher->hashPassword(
                     $user,
-                    $data->get('password')
+                    $data->get('plainPassword')
                 );
                 $user->setName($data->get('name'))
                     ->setSurname($data->get('surname'))
@@ -57,31 +61,32 @@ class AuthController extends AbstractController
                 $this->documentManager->flush();
             }
             if($user != null){
-                return $this->successResponse([
+                $security->login($user);
+                return $this->json([
                     'message' => 'User created successfully',
-                    'userId' => $user->getId()
+                    'user' => $user->getUserIdentifier(),
+                    'redirect' => $this->generateUrl('homepage')
                 ], 201);
             }
             else
-                return $this->errorResponse('Error creating account: the user already exists', 401);
+                return $this->json(['error' => 'Utente già registrato'], 401);
         } catch (\Exception $e) {
-            return $this->errorResponse('Error creating account: ' . $e->getMessage());
+            return $this->json(['error' => 'Errore nella creazione dell account: ' . $e->getMessage()], 400);
         }
     }
 
     #[Route('/api/login', name: 'api_login', methods: ['POST'])]
     public function loginUser(#[CurrentUser] ?User $user): Response
     {
-        if (null === $user) {
+        if ($user === null) {
             return $this->json([
                 'message' => 'missing credentials',
             ], Response::HTTP_UNAUTHORIZED);
         }
 
-        $token = "tokenexample"; // somehow create an API token for $user
         return $this->json([
             'user'  => $user->getUserIdentifier(),
-            'token' => $token,
+            'redirect' => $this->generateUrl('homepage')
         ]);
     }
 
