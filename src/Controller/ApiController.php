@@ -52,10 +52,10 @@ class ApiController extends AbstractController
         $data = $request->getPayload();
         $user = $this->documentManager->getRepository(User::class)
             ->findOneBy(['email' => $data->get('email')]);
-        $user->setEmail($data->get('email'));
-        $user->setName($data->get('name'));
-        $user->setSurname($data->get('surname'));
-        $user->setRoles($data->all('roles'));
+        $user->setEmail($data->get('email'))
+            ->setName($data->get('name'))
+            ->setSurname($data->get('surname'))
+            ->setRoles($data->all('roles'));
         $this->documentManager->persist($user);
         $this->documentManager->flush();
         return $this->json($user);
