@@ -25,44 +25,7 @@ class AuthController extends AbstractController
         return $this->render("login.html.twig");
     }
 
-    #[Route('/homepage', name: 'homepage')]
-    public function homepage(): Response
-    {
-        $user = $this->getUser();
-        if (!$user)
-            return $this->redirectToRoute('index');
-        return $this->render("homepage.html.twig", ["user" => $user]);
-    }
-
-    #[Route('/userslist', name: 'users_list')]
-    public function usersList(): Response
-    {
-        return $this->render("users-list.html.twig");
-    }
-
-    #[Route('/api/userslist', name: 'api_users_list', methods: ['POST'])]
-    public function getUsersList(): false|JsonResponse
-    {
-        $users = $this->documentManager->getRepository(User::class)->findAll();
-        return $this->json($users);
-    }
-
-    #[Route('/api/changeUserStatus', methods: ['POST'])]
-    public function changeUserStatus(Request $request): Response
-    {
-        $data = $request->getPayload();
-        $user = $this->documentManager->getRepository(User::class)
-                ->findOneBy(['email' => $data->get('email')]);
-        if($user->isEnabled())
-            $user->setEnabled(false);
-        else
-            $user->setEnabled(true);
-        $this->documentManager->persist($user);
-        $this->documentManager->flush();
-        return $this->json($user);
-    }
-
-    #[Route('/api/registration', methods: ['POST'])]
+    #[Route('/auth/registration', methods: ['POST'])]
     public function createUser(
         Request $request,
         UserPasswordHasherInterface $passwordHasher,
@@ -81,7 +44,8 @@ class AuthController extends AbstractController
                 $user->setName($data->get('name'))
                     ->setSurname($data->get('surname'))
                     ->setEmail($data->get('email'))
-                    ->setPassword($hashedPassword);
+                    ->setPassword($hashedPassword)
+                    ->setRoles(['BASE_USER']);
 
                 $this->documentManager->persist($user);
                 $this->documentManager->flush();
@@ -101,18 +65,25 @@ class AuthController extends AbstractController
         }
     }
 
-    #[Route('/api/login', name: 'api_login', methods: ['POST'])]
+    #[Route('/auth/login', name: 'api_login', methods: ['POST'])]
     public function loginUser(#[CurrentUser] ?User $user): Response
     {
         if ($user === null) {
             return $this->json([
-                'message' => 'Credenziali mancanti',
+                'error' => 'Credenziali mancanti',
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+
+        if(in_array("UNABLED_USER", $user->getRoles())){
+            return $this->json([
+                'error' => 'Utente disabilitato',
             ], Response::HTTP_UNAUTHORIZED);
         }
 
         return $this->json([
             'user'  => $user->getUserIdentifier(),
-            'redirect' => $this->generateUrl('homepage')
+            'messahe' => 'Login effettuato!',
+            'redirect' => $this->generateUrl('users_list')
         ]);
     }
 
