@@ -30,9 +30,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ODM\Field(type: 'date')]
     private \DateTime $createdAt;
 
-    #[ODM\Field(type: 'boolean')]
-    private bool $enabled;
-
     public function __construct()
     {
         $this->createdAt = new \DateTime();
@@ -71,21 +68,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getRoles(): array
     {
-        $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
-
-        return array_unique($roles);
+        return array_unique($this->roles);
     }
 
     public function getCreatedAt(): \DateTime
     {
         return $this->createdAt;
-    }
-
-    public function isEnabled(): bool
-    {
-        return $this->enabled;
     }
 
     // Setters
@@ -124,11 +112,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->createdAt = $createdAt;
         return $this;
-    }
-
-    public function setEnabled(bool $enabled): void
-    {
-        $this->enabled = $enabled;
     }
 
     public function eraseCredentials(): void
