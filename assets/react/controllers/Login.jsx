@@ -1,5 +1,7 @@
-import './Login.css'
-import {Form, Input, Button, Flex, Card, message} from 'antd'
+import '../../styles/Login.css'
+import {authRequest} from '../utils'
+import { LockOutlined, UserOutlined } from '@ant-design/icons'
+import {Form, Input, Button, Flex, Card} from 'antd'
 import {useRef} from "react";
 
 function Login() {
@@ -8,47 +10,11 @@ function Login() {
     const loginFormRef = useRef(null)
 
     const handleRegister = async () => {
-        try {
-            const values = registrationFormRef.current.getFieldsValue()
-            const response = await fetch('/api/registration', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(values),
-            })
-            const data = await response.json()
-            if (response.ok) {
-                message.success(data.message)
-                //registrationFormRef.current.resetFields()
-                window.location.href = data.redirect
-            } else {
-                message.error(data.error)
-            }
-        } catch (err) {
-            message.error('Errore di connessione al server')
-        }
+        await authRequest('registration', registrationFormRef.current.getFieldsValue());
     }
 
-    // Funzione per login
     const handleLogin = async () => {
-        try {
-            const values = loginFormRef.current.getFieldsValue()
-            const response = await fetch('/api/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(values),
-            })
-            const data = await response.json()
-            console.log(data);
-            if (response.ok) {
-                message.success('Login effettuato!')
-                //loginFormRef.current.resetFields()
-                window.location.href = data.redirect
-            } else {
-                message.error(data.error || 'Credenziali errate')
-            }
-        } catch (err) {
-            message.error('Errore di connessione al server')
-        }
+        await authRequest('login', loginFormRef.current.getFieldsValue());
     }
 
   return (
@@ -57,39 +23,39 @@ function Login() {
         <h1>Form di registrazione e login con Symfony</h1>
         <p>Esercizio di connessione e comunicazione con database Mongo sfruttando il PHP framework "Symfony"</p>
       </div>
-      <Flex className='flexBox'  align='center'>
+      <Flex className='flexBox' align='center'>
         <Flex className='formFlex' justify='center' align='flex-start'>
           <Card className='formCard' title="Registra utente" hoverable>
-            <Form ref={registrationFormRef}>
-              <Form.Item label="Nome" name="name">
+            <Form ref={registrationFormRef} onFinish={handleRegister}>
+              <Form.Item label="Nome" name="name" rules={[{ required: true, message: 'Inserisci il nome!' }]}>
                 <Input placeholder='Nome utente' />
               </Form.Item>
-              <Form.Item label="Cognome" name="surname">
+              <Form.Item label="Cognome" name="surname" rules={[{ required: true, message: 'Inserisci il cognome!' }]}>
                 <Input placeholder='Cognome utente' />
               </Form.Item>
-              <Form.Item label="Email" name="email">
+              <Form.Item label="Email" name="email" rules={[{ required: true, message: "Inserisci l'indirizzo email!" }]}>
                 <Input type="email" placeholder='Email' />
               </Form.Item>
-              <Form.Item label="Password" name="plainPassword">
+              <Form.Item  label="Password" name="plainPassword" rules={[{ required: true, message: 'Inserisci la password!' }]}>
                 <Input.Password placeholder='Password' />
               </Form.Item>
               <Form.Item>
-                <Button block type='primary' onClick={handleRegister}>Registrati</Button>
+                <Button block type='primary' htmlType="submit">Registrati</Button>
               </Form.Item>
             </Form>
           </Card>
         </Flex>
         <Flex className='formFlex' justify='center' align='flex-start'>
           <Card className='formCard' title="Login utente" hoverable>
-            <Form ref={loginFormRef}>
-              <Form.Item label="Email" name="username">
-                <Input type="email" placeholder='Email' />
+            <Form ref={loginFormRef} onFinish={handleLogin}>
+              <Form.Item label="Email" name="username" rules={[{ required: true, message: "Inserisci l'indirizzo email!" }]}>
+                <Input prefix={<UserOutlined />} type="email" placeholder='Email' />
               </Form.Item>
-              <Form.Item label="Password" name="password">
-                <Input.Password placeholder='Password' />
+              <Form.Item label="Password" name="password" rules={[{ required: true, message: 'Inserisci la password!' }]}>
+                <Input.Password prefix={<LockOutlined />} placeholder='Password' />
               </Form.Item>
               <Form.Item>
-                <Button block type='primary' onClick={handleLogin}>Login</Button>
+                <Button block type='primary' htmlType="submit">Login</Button>
               </Form.Item>
             </Form>
           </Card>
