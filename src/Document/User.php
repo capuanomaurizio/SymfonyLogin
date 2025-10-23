@@ -30,6 +30,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ODM\Field(type: 'date')]
     private \DateTime $createdAt;
 
+    #[ODM\Field(type: 'string')]
+    private string $assignedDatabase;
+
     public function __construct()
     {
         $this->createdAt = new \DateTime();
@@ -76,6 +79,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->createdAt;
     }
 
+    public function getAssignedDatabase(): string
+    {
+        return $this->assignedDatabase;
+    }
+
     // Setters
     public function setName(string $name): self
     {
@@ -111,6 +119,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setCreatedAt(\DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
+        return $this;
+    }
+
+    public function setAssignedDatabase(string $assignedDatabase): self
+    {
+        $this->assignedDatabase = $assignedDatabase;
         return $this;
     }
 
