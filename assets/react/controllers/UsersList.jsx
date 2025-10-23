@@ -51,9 +51,17 @@ const UsersList = ({ onEditClick }) => {
             render: (_, { roles }) => (
                 <>
                     {roles.map(role => {
-                        let color = role.length > 5 ? 'geekblue' : 'green';
-                        if(role === 'UNABLED_USER')
-                            color = 'red';
+                        let color;
+                        switch (role) {
+                            case 'UNABLED_USER':
+                                color = 'red'; break;
+                            case 'ADMIN_USER':
+                                color = 'gold'; break;
+                            case 'BASE_USER':
+                                color = 'geekblue'; break;
+                            default:
+                                color = 'green'; break;
+                        }
                         return (
                             <Tag color={color} key={role}>
                                 {role.toUpperCase()}
