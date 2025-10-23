@@ -26,9 +26,9 @@ class UsersController extends AbstractController
     }
 
     #[Route('/user/userslist', name: 'users_list')]
-    public function usersList(#[CurrentUser] ?User $user): Response
+    public function usersList(#[CurrentUser] ?User $admin): Response
     {
-        if (!$user)
+        if (!$admin || !in_array('ADMIN_USER', $admin->getRoles()))
             return $this->redirectToRoute('index');
         return $this->render("users-list.html.twig");
     }
