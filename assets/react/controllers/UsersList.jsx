@@ -3,7 +3,7 @@ import React, {useEffect, useState} from 'react';
 import {Button, Space, Table, Tag} from 'antd';
 import {EditFilled, UserAddOutlined, UserDeleteOutlined} from "@ant-design/icons";
 
-const UsersList = ({ onEditClick }) => {
+const UsersList = () => {
 
     const [users, setUsers] = useState([]);
     const [refreshKey, setRefreshKey] = useState(0);
@@ -11,6 +11,10 @@ const UsersList = ({ onEditClick }) => {
 
     const fetchUsers = async () => {
         setUsers(await apiRequest('userslist').finally(() => {setLoading(false)}));
+    };
+
+    function editUser(user) {
+        window.location.href = user;
     };
 
     useEffect(() => {
@@ -76,7 +80,7 @@ const UsersList = ({ onEditClick }) => {
             key: 'azione',
             render: (_, record) => (
                 <Space size="middle">
-                    <Button type="primary" onClick={() => onEditClick(record)}><EditFilled /></Button>
+                    <Button type="primary" onClick={() => editUser(record.email)}><EditFilled /></Button>
                     {record.roles.includes('UNABLED_USER') ? (
                         <Button color="green" variant="solid" onClick={() => changeUserStatus(record.email)}><UserAddOutlined /></Button>
                     ) : (
@@ -93,7 +97,7 @@ const UsersList = ({ onEditClick }) => {
             dataSource={users}
             rowKey="email"
             loading={loading}
-            pagination={{ pageSize: 5 }}
+            pagination={{ pageSize: 10 }}
         />
     );
 };

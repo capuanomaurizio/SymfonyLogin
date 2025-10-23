@@ -12,6 +12,10 @@ export default function UserProfile({ user }) {
         form.setFieldsValue(user); // popola i campi
     }, [user, form]);
 
+    function backToUsersList(){
+        window.location.href = "userslist";
+    }
+
     async function sendEdits(values) {
         await apiRequest('editUser', values);
         window.location.reload();
@@ -70,6 +74,9 @@ export default function UserProfile({ user }) {
                 </Form.Item>
                 <Form.Item label={null}>
                     <Space size="middle">
+                        <Button type="text" onClick={backToUsersList}>
+                            Annulla
+                        </Button>
                         <Button type="primary" htmlType="submit">
                             Modifica
                         </Button>
