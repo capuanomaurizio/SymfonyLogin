@@ -1,6 +1,6 @@
 import {apiRequest} from '../utils'
 import React, {useEffect, useState} from 'react';
-import {Button, message, Space, Table, Tag} from 'antd';
+import {Button, Space, Table, Tag} from 'antd';
 import {EditFilled, UserAddOutlined, UserDeleteOutlined} from "@ant-design/icons";
 
 const UsersList = ({ onEditClick }) => {
