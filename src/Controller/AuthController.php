@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use Doctrine\ODM\MongoDB\DocumentManager;
+use App\Service\DatabaseManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -16,7 +16,7 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 class AuthController extends AbstractController
 {
     public function __construct(
-        private readonly DocumentManager $documentManager
+        private readonly DatabaseManager $databaseManager,
     ) {}
 
     #[Route('/', name: 'index')]
@@ -33,28 +33,11 @@ class AuthController extends AbstractController
     ): JsonResponse {
         try {
             $data = $request->getPayload();
-            $user = null;
-            if($this->documentManager->getRepository(User::class)
-                    ->findOneBy(['email' => $data->get('email')]) == null){
-                $user = new User();
-                $hashedPassword = $passwordHasher->hashPassword(
-                    $user,
-                    $data->get('plainPassword')
-                );
-                $user->setName($data->get('name'))
-                    ->setSurname($data->get('surname'))
-                    ->setEmail($data->get('email'))
-                    ->setPassword($hashedPassword)
-                    ->setRoles(['BASE_USER']);
-
-                $this->documentManager->persist($user);
-                $this->documentManager->flush();
-            }
-            if($user != null){
-                $security->login($user);
+            if(!$this->databaseManager->getUser($data->get('email'))){
+                $security->login($this->databaseManager->createUser($data, $passwordHasher));
                 return $this->json([
                     'message' => 'Utente creato correttamente',
-                    'user' => $user->getUserIdentifier(),
+                    'user' => $security->getUser()->getUserIdentifier(),
                     'redirect' => $this->generateUrl('homepage')
                 ], 201);
             }
@@ -82,7 +65,7 @@ class AuthController extends AbstractController
 
         return $this->json([
             'user'  => $user->getUserIdentifier(),
-            'messahe' => 'Login effettuato!',
+            'message' => 'Login effettuato!',
             'redirect' => $this->generateUrl('users_list')
         ]);
     }
