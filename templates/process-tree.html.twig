@@ -1,9 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}User profile{% endblock %}
+{% block title %}Componenti del processo{% endblock %}
 
 {% block body %}
-    <div {{ react_component('TreeViewer', { processes }) }}>
+    <div {{ react_component('ProcessComponents', { processTree }) }}>
         Loading... <i class="fas fa-cog fa-spin fa-3x"></i>
     </div>
 {% endblock %}
