@@ -2,10 +2,11 @@
 
 namespace App\Document;
 
+use App\Repository\ProcessesRepository;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ODM\Document(collection: 'processes')]
+#[ODM\Document(collection: 'processes',repositoryClass: ProcessesRepository::class)]
 class Process
 {
     #[ODM\Id]
