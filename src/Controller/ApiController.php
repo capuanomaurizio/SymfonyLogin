@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Document\Process;
 use App\Document\User;
+use App\Service\DynamicUserDatabaseManager;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -16,7 +18,8 @@ class ApiController extends AbstractController
 {
 
     public function __construct(
-        private readonly DocumentManager $documentManager
+        private readonly DocumentManager $documentManager,
+        private readonly DynamicUserDatabaseManager $dbManager
     ) {}
 
     #[Route('/api/userslist', methods: ['POST'])]
@@ -59,5 +62,17 @@ class ApiController extends AbstractController
         $this->documentManager->persist($user);
         $this->documentManager->flush();
         return $this->json($user);
+    }
+
+    #[Route('/api/createProcess', methods: ['POST'])]
+    public function editComponent(Request $request): Response
+    {
+        $data = $request->getPayload();
+        $process = (new Process())->setName($data->get('name'));
+        $this->dbManager->getManagerForCurrentUser()->persist($process);
+        $this->dbManager->getManagerForCurrentUser()->flush();
+        return $this->redirectToRoute('process_route', [
+            'id' => $data->get('id'),
+        ]);
     }
 }
