@@ -19,7 +19,7 @@ class Component
     private string $name;
 
     #[ODM\ReferenceOne(storeAs: 'dbRef', targetDocument: Component::class, cascade: ['persist', 'remove'])]
-    private ?Component $parent_component;
+    private ?Component $parent_component = null;
 
     #[ODM\ReferenceMany(storeAs: 'dbRef', targetDocument: Component::class, cascade: ['persist', 'remove'])]
     #[Groups(['process:read'])]
