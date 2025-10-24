@@ -16,8 +16,8 @@ export default function UserProfile({ user }) {
         window.location.href = "userslist";
     }
 
-    async function sendEdits(values) {
-        await apiRequest('editUser', values);
+    function sendEdits(values) {
+        apiRequest('editUser', values);
         window.location.reload();
     }
 
