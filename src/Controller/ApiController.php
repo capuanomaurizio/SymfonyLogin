@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Document\Component;
 use App\Document\Process;
 use App\Document\User;
 use App\Service\DynamicUserDatabaseManager;
@@ -13,17 +14,19 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class ApiController extends AbstractController
 {
 
     public function __construct(
         private readonly DocumentManager $documentManager,
-        private readonly DynamicUserDatabaseManager $dbManager
+        private readonly DynamicUserDatabaseManager $dbManager,
+        private readonly SerializerInterface $serializer
     ) {}
 
     #[Route('/api/userslist', methods: ['POST'])]
-    public function getUsersList(): false|JsonResponse
+    public function getUsersList(): JsonResponse
     {
         $users = $this->documentManager->getRepository(User::class)->findAll();
         return $this->json($users);
@@ -64,15 +67,55 @@ class ApiController extends AbstractController
         return $this->json($user);
     }
 
+    #[Route('/api/processesList', methods: ['POST'])]
+    public function getProcessesList(): JsonResponse
+    {
+        $processes = $this->dbManager->getManagerForCurrentUser()->getRepository(Process::class)->findAll();
+        return $this->json($this->serializer->serialize($processes, 'json', ['groups' => ['process:read']]));
+    }
+
     #[Route('/api/createProcess', methods: ['POST'])]
-    public function editComponent(Request $request): Response
+    public function createProcess(Request $request): Response
     {
         $data = $request->getPayload();
         $process = (new Process())->setName($data->get('name'));
         $this->dbManager->getManagerForCurrentUser()->persist($process);
         $this->dbManager->getManagerForCurrentUser()->flush();
-        return $this->redirectToRoute('process_route', [
-            'id' => $data->get('id'),
+        return $this->json([
+            'redirect' => $this->generateUrl('process_route', ['id' => $process->getId()]),
         ]);
     }
+
+    #[Route('/api/editProcess', methods: ['POST'])]
+    public function editProcess(Request $request): Response
+    {
+        $data = $request->getPayload();
+        $process = $this->dbManager->getManagerForCurrentUser()->getRepository(Process::class)->findOneBy(['id' => $data->get('id')]);
+        $process->setName($data->get('new_name'));
+        $this->dbManager->getManagerForCurrentUser()->persist($process);
+        $this->dbManager->getManagerForCurrentUser()->flush();
+        return $this->json([]);
+    }
+
+    #[Route('/api/deleteProcess', methods: ['POST'])]
+    public function deleteProcess(Request $request): Response
+    {
+        $data = $request->getPayload();
+        $process = $this->dbManager->getManagerForCurrentUser()->getRepository(Process::class)->findOneBy(['id' => $data->get('id')]);
+        $this->dbManager->getManagerForCurrentUser()->remove($process);
+        $this->dbManager->getManagerForCurrentUser()->flush();
+        return $this->json([]);
+    }
+
+    #[Route('/api/editComponent', methods: ['POST'])]
+    public function editComponent(Request $request): Response
+    {
+        $data = $request->getPayload();
+        $component = $this->dbManager->getManagerForCurrentUser()->getRepository(Component::class)->findOneBy(['id' => $data->get('id')]);
+        $component->setName($data->get('new_name'));
+        $this->dbManager->getManagerForCurrentUser()->persist($component);
+        $this->dbManager->getManagerForCurrentUser()->flush();
+        return $this->json([]);
+    }
 }
+

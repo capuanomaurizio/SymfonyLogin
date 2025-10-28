@@ -15,20 +15,13 @@ use Symfony\Component\Serializer\SerializerInterface;
 class CollectionsController extends AbstractController
 {
 
-    public function __construct(
-        private readonly DynamicUserDatabaseManager $dbManager,
-        private readonly SerializerInterface $serializer
-    ){}
-
     /**
      * @throws ExceptionInterface
      */
     #[Route('/collections/processes')]
     public function processesList(): Response
     {
-        $processes = $this->dbManager->getManagerForCurrentUser()->getRepository(Process::class)->findAll();
-        $json = $this->serializer->serialize($processes, 'json', ['groups' => ['process:read']]);
-        return $this->render('processes.html.twig', ['processes' => $json]);
+        return $this->render('processes.html.twig');
     }
 
     /**
@@ -37,12 +30,7 @@ class CollectionsController extends AbstractController
     #[Route('/collections/process/{id}', name: 'process_route')]
     public function processTree(string $id): Response
     {
-
-        $processTree = $this->dbManager->getManagerForCurrentUser()->getRepository(Process::class)->getProcessTree(
-            $this->dbManager->getManagerForCurrentUser()->getRepository(Process::class)->findOneby(['id' => $id])
-        );
-        $json = $this->serializer->serialize($processTree, 'json', ['groups' => ['process:read']]);
-        return $this->render('process-tree.html.twig', ['processTree' => $json]);
+        return $this->render('process-tree.html.twig', ['processId' => $id]);
     }
 
     #[Route('/collections/initialize')]
