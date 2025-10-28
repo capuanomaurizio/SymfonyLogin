@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Avatar, Button, Card, Form, Input, List, message, Space} from "antd";
-import {DeleteOutlined, EditFilled, EditOutlined, FileAddFilled} from "@ant-design/icons";
+import {DeleteOutlined, EditOutlined, FileAddFilled} from "@ant-design/icons";
 import {apiRequest} from "../utils";
 
 const transformProcesses = (processes) =>
