@@ -1,8 +1,7 @@
-import React, {useState} from 'react';
-import {Avatar, Button, Card, Form, Input, List} from "antd";
-import {EditFilled, FileAddFilled} from "@ant-design/icons";
+import React, {useEffect, useState} from 'react';
+import {Avatar, Button, Card, Form, Input, List, message, Space} from "antd";
+import {DeleteOutlined, EditFilled, EditOutlined, FileAddFilled} from "@ant-design/icons";
 import {apiRequest} from "../utils";
-
 
 const transformProcesses = (processes) =>
     processes.map((process) => ({
@@ -11,19 +10,51 @@ const transformProcesses = (processes) =>
     }));
 
 function createProcess(nameObj){
-    apiRequest('createProcess', nameObj);
+    apiRequest('createProcess', nameObj).then(result => {
+        if (result?.redirect) {
+            window.location.href = result.redirect;
+        } else {
+            console.error('No redirect URL returned from API');
+        }
+    }).catch(console.error);
 }
-export default function ProcessesList({ processes }) {
 
-    const data = transformProcesses(JSON.parse(processes));
+
+
+export default function ProcessesList() {
+
+    const [processes, setProcesses] = useState([]);
     const [hidden, setHidden] = useState(true);
+    const [refreshKey, setRefreshKey] = useState(0);
+
+    const fetchProcesses = () => {
+        apiRequest('processesList')
+            .then(result => {
+                setProcesses(transformProcesses(JSON.parse(result)));
+            })
+            .catch(console.error);
+    }
+
+    function deleteProcess(id){
+        apiRequest('deleteProcess', {id: id});
+        message.success("Processo eliminato con successo!")
+        setRefreshKey(refreshKey + 1);
+    }
+
+    useEffect(() => {
+        fetchProcesses();
+    }, [refreshKey]);
+
+    if (!processes || processes.length === 0) {
+        return <p>Caricamento dei processi dell'utente...</p>;
+    }
 
     return (
         <>
         <Card title="Lista dei processi dell'utente" style={{ marginBottom: '1rem' }} >
             <List
                 itemLayout="horizontal"
-                dataSource={data}
+                dataSource={processes}
                 renderItem={(item, index) => (
                     <List.Item>
                         <List.Item.Meta
@@ -31,9 +62,14 @@ export default function ProcessesList({ processes }) {
                             title={item.title}
                             description={item.key}
                         />
-                        <Button variant="outlined" onClick={() => {window.location.href = "/collections/process/"+item.key}}>
-                            <EditFilled />
-                        </Button>
+                        <Space size={"middle"}>
+                            <Button variant="outlined" onClick={() => {window.location.href = "/collections/process/"+item.key}}>
+                                <EditOutlined />
+                            </Button>
+                            <Button variant="outlined" color="danger" onClick={() => deleteProcess(item.key)}>
+                                <DeleteOutlined />
+                            </Button>
+                        </Space>
                     </List.Item>
                 )}
             >
