@@ -1,41 +1,29 @@
 <?php
 namespace App\Service;
 
+use App\Document\User;
+use Doctrine\Common\EventManager;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Configuration;
 use MongoDB\Client;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
 
-class DynamicUserDatabaseManager
+#[AsDecorator(decorates: DocumentManager::class)]
+class DynamicUserDatabaseManager extends DocumentManager
 {
-    private array $dmCache = [];
-
     public function __construct(
+        ?Client $client = null,
+        ?Configuration $config = null,
+        ?EventManager $eventManager = null,
         private readonly Security $security,
-        private readonly Configuration $baseConfig
-    ) {}
-
-    public function getManagerForCurrentUser(): DocumentManager
+    )
     {
         $user = $this->security->getUser();
-        $dbName = $user?->getAssignedDatabase();
-
-        if (!$dbName)
-            throw new \RuntimeException('Utente senza database associato.');
-
-        if (isset($this->dmCache[$dbName]))
-            return $this->dmCache[$dbName];
-
-        // Crea un nuovo client Mongo che punta a quel database
-        $client = new Client($_ENV['MONGODB_URI']);
-
-        // Clona la configurazione base
-        $config = clone $this->baseConfig;
-        $config->setDefaultDB($dbName);
-
-        $dm = DocumentManager::create($client, $config);
-        $this->dmCache[$dbName] = $dm;
-
-        return $dm;
+        if ($user instanceof User) {
+            $dbName = $user?->getAssignedDatabase();
+            $config->setDefaultDB($dbName);
+        }
+        parent::__construct($client, $config, $eventManager);
     }
 }

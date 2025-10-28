@@ -21,7 +21,6 @@ class ApiController extends AbstractController
 
     public function __construct(
         private readonly DocumentManager $documentManager,
-        private readonly DynamicUserDatabaseManager $dbManager,
         private readonly SerializerInterface $serializer
     ) {}
 
@@ -70,7 +69,7 @@ class ApiController extends AbstractController
     #[Route('/api/processesList', methods: ['POST'])]
     public function getProcessesList(): JsonResponse
     {
-        $processes = $this->dbManager->getManagerForCurrentUser()->getRepository(Process::class)->findAll();
+        $processes = $this->documentManager->getRepository(Process::class)->findAll();
         return $this->json($this->serializer->serialize($processes, 'json', ['groups' => ['process:read']]));
     }
 
@@ -79,8 +78,8 @@ class ApiController extends AbstractController
     {
         $data = $request->getPayload();
         $process = (new Process())->setName($data->get('name'));
-        $this->dbManager->getManagerForCurrentUser()->persist($process);
-        $this->dbManager->getManagerForCurrentUser()->flush();
+        $this->documentManager->persist($process);
+        $this->documentManager->flush();
         return $this->json([
             'redirect' => $this->generateUrl('process_route', ['id' => $process->getId()]),
         ]);
@@ -90,10 +89,10 @@ class ApiController extends AbstractController
     public function editProcess(Request $request): Response
     {
         $data = $request->getPayload();
-        $process = $this->dbManager->getManagerForCurrentUser()->getRepository(Process::class)->findOneBy(['id' => $data->get('id')]);
+        $process = $this->documentManager->getRepository(Process::class)->findOneBy(['id' => $data->get('id')]);
         $process->setName($data->get('new_name'));
-        $this->dbManager->getManagerForCurrentUser()->persist($process);
-        $this->dbManager->getManagerForCurrentUser()->flush();
+        $this->documentManager->persist($process);
+        $this->documentManager->flush();
         return $this->json([]);
     }
 
@@ -101,9 +100,9 @@ class ApiController extends AbstractController
     public function deleteProcess(Request $request): Response
     {
         $data = $request->getPayload();
-        $process = $this->dbManager->getManagerForCurrentUser()->getRepository(Process::class)->findOneBy(['id' => $data->get('id')]);
-        $this->dbManager->getManagerForCurrentUser()->remove($process);
-        $this->dbManager->getManagerForCurrentUser()->flush();
+        $process = $this->documentManager->getRepository(Process::class)->findOneBy(['id' => $data->get('id')]);
+        $this->documentManager->remove($process);
+        $this->documentManager->flush();
         return $this->json([]);
     }
 
@@ -111,10 +110,10 @@ class ApiController extends AbstractController
     public function editComponent(Request $request): Response
     {
         $data = $request->getPayload();
-        $component = $this->dbManager->getManagerForCurrentUser()->getRepository(Component::class)->findOneBy(['id' => $data->get('id')]);
+        $component = $this->documentManager->getRepository(Component::class)->findOneBy(['id' => $data->get('id')]);
         $component->setName($data->get('new_name'));
-        $this->dbManager->getManagerForCurrentUser()->persist($component);
-        $this->dbManager->getManagerForCurrentUser()->flush();
+        $this->documentManager->persist($component);
+        $this->documentManager->flush();
         return $this->json([]);
     }
 }
