@@ -19,7 +19,7 @@ class Process
 
     #[ODM\ReferenceOne(storeAs: 'dbRef', targetDocument: Component::class)]
     #[Groups(['process:read'])]
-    private ?Component $component;
+    private ?Component $component = null;
 
     public function getId(): ?string
     {
