@@ -7,7 +7,6 @@ namespace App\Controller;
 use App\Document\Component;
 use App\Document\Process;
 use App\Document\User;
-use App\Service\DynamicUserDatabaseManager;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -102,6 +101,19 @@ class ApiController extends AbstractController
         $data = $request->getPayload();
         $process = $this->documentManager->getRepository(Process::class)->findOneBy(['id' => $data->get('id')]);
         $this->documentManager->remove($process);
+        $this->documentManager->flush();
+        return $this->json([]);
+    }
+
+    #[Route('/api/createComponent', methods: ['POST'])]
+    public function createComponent(Request $request): Response
+    {
+        $data = $request->getPayload();
+        $parentComponent = $this->documentManager->getRepository(Component::class)->findOneBy(['id' => $data->get('parent_id')]);
+        $component = (new Component())->setName($data->get('name'))->setParentComponent($parentComponent);
+        $parentComponent->addChildComponent($component);
+        $this->documentManager->persist($component);
+        $this->documentManager->persist($parentComponent);
         $this->documentManager->flush();
         return $this->json([]);
     }

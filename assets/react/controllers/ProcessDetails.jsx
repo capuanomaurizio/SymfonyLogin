@@ -1,14 +1,19 @@
-import {Button, Card, Collapse, ConfigProvider, Form, Input, message, Steps, Tree} from "antd";
+import {
+    Button, Card, Collapse, ConfigProvider, Form, Input, message, Steps, Drawer, Space, Col, Row, Dropdown
+} from "antd";
 import React, {useEffect, useState} from 'react';
 import {apiRequest} from "../utils";
-import {CloseOutlined, EditOutlined} from "@ant-design/icons";
+import {DeleteOutlined, DownOutlined, EditOutlined, FileAddOutlined} from "@ant-design/icons";
 
 export default function ProcessDetails({ processId }) {
 
     const [componentToEdit, setComponentToEdit] = useState(null)
+    const [componentToCreate, setComponentToCreate] = useState(null)
     const [processes, setProcesses] = useState([]);
     const [refreshKey, setRefreshKey] = useState(0);
     const [current, setCurrent] = useState(0);
+    const [openEditDrawer, setOpenEditDrawer] = useState(false);
+    const [openCreateDrawer, setOpenCreateDrawer] = useState(false);
 
     function findComponentById(component, id) {
         if (component.id === id) return component;
@@ -29,20 +34,53 @@ export default function ProcessDetails({ processId }) {
                         ghost
                         items={component.children_components.map(transformComponent)}
                     />
-                ) : (<></>)}
+                ) : ( <></> )}
             </>
         ),
         extra: genExtra(component, component.id)
     });
 
-    const genExtra = (component, id) => (
-        <Button onClick={event => {
-            event.stopPropagation();
-            setComponentToEdit(findComponentById(component, id))
-        }}>
-            <EditOutlined/>
-        </Button>
-    );
+    function genExtra(component, id) {
+        const items = [
+            {
+                key: '1',
+                label: (
+                    <a onClick={(e) => {e.stopPropagation(); setComponentToEdit(findComponentById(component, id)); setOpenEditDrawer(true);}}>
+                        Modifica
+                    </a>
+                ),
+                icon: <EditOutlined />,
+            },
+            {
+                key: '2',
+                label: (
+                    <a onClick={(e) => {e.stopPropagation(); setComponentToCreate(findComponentById(component, id)); setOpenCreateDrawer(true);}}>
+                        Aggiungi figlio
+                    </a>
+                ),
+                icon: <FileAddOutlined />,
+            },
+            {
+                key: '3',
+                label: (
+                    <a target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">
+                        Elimina
+                    </a>
+                ),
+                icon: <DeleteOutlined/>,
+            },
+        ];
+        return (
+            <Dropdown menu={{items}}>
+                <a onClick={e => e.stopPropagation()}>
+                    <Space>
+                        Opzioni
+                        <DownOutlined/>
+                    </Space>
+                </a>
+            </Dropdown>
+        )
+    }
 
     const fetchProcesses = () => {
         apiRequest('processesList')
@@ -78,7 +116,12 @@ export default function ProcessDetails({ processId }) {
         await apiRequest('editComponent', {'id' : componentToEdit.id, 'new_name': nameObj.name});
         setRefreshKey(refreshKey + 1);
         message.success("Nome del componente modificato!");
-        setComponentToEdit(null)
+    }
+
+    async function createComponent(nameObj) {
+        await apiRequest('createComponent', {'parent_id' : componentToCreate.id, 'name': nameObj.name});
+        setRefreshKey(refreshKey + 1);
+        message.success("Componente creato!");
     }
 
     return (
@@ -124,53 +167,101 @@ export default function ProcessDetails({ processId }) {
             </Card>
         ) : (
             <>
-                <ConfigProvider
-                    theme={{
-                        components: {
-                            Collapse: {
-                                headerBg: '#fff',
-                                contentBg: '#fff',
-                                headerPadding: '8px 16px',
-                            },
+            <ConfigProvider
+                theme={{
+                    components: {
+                        Collapse: {
+                            headerBg: '#fff',
+                            contentBg: '#fff',
+                            headerPadding: '8px 16px',
                         },
-                    }}
-                >
-                    <Collapse
-                        items={treeData}
-                    />
-                </ConfigProvider>
-                {componentToEdit === null ? (
-                    <></>
-                    ) : (
-                    <Card
-                        title={"Componente "+componentToEdit.id}
-                        style={{ minHeight: '35vh', marginTop: '1rem' }}
-                        extra={<Button onClick={() => setComponentToEdit(null)} >
-                                    <CloseOutlined/>
-                                </Button>}
-                        key={refreshKey}>
-                        <Form
-                            labelCol={{ span: 8 }}
-                            wrapperCol={{ span: 16 }}
-                            style={{ maxWidth: 600 }}
-                            autoComplete="off"
-                            onFinish={(nameObj) => editComponent(nameObj)}
-                        >
+                    },
+                }}
+            >
+                <Collapse
+                    items={treeData}
+                />
+            </ConfigProvider>
+            <Drawer
+                key={refreshKey}
+                title={"Modifica componente "+componentToEdit?.name}
+                width={920}
+                onClose={() => setOpenEditDrawer(false)}
+                open={openEditDrawer}
+                styles={{
+                    body: {
+                        paddingBottom: 80,
+                    },
+                }}
+                extra={
+                    <Space>
+                        <Button onClick={() => setOpenEditDrawer(false)}>Cancel</Button>
+                        <Button htmlType="submit" form="editComponentForm" type="primary">
+                            Submit
+                        </Button>
+                    </Space>
+                }
+            >
+                <Form layout="vertical" requiredMark={false}
+                    id="editComponentForm"
+                    onFinish={(nameObj) => {
+                        editComponent(nameObj);
+                        setOpenEditDrawer(false);
+                    }}>
+
+                    <Row gutter={16}>
+                        <Col span={12}>
                             <Form.Item
-                                label="Nome componente"
                                 name="name"
-                                rules={[{ required: true, message: "Non lasciare vuoto il campo" }]}
+                                label="Name"
+                                rules={[{ required: true, message: 'Non lasciare il campo vuoto' }]}
                             >
-                                <Input placeholder={componentToEdit.name}/>
+                                <Input placeholder="Nuovo nome del componente" />
                             </Form.Item>
-                            <Form.Item label={null}>
-                                <Button type="primary" htmlType="submit">
-                                    Modifica
-                                </Button>
+                        </Col>
+                    </Row>
+                </Form>
+            </Drawer>
+
+
+            <Drawer
+                title={"Crea nuovo componente"}
+                width={920}
+                onClose={() => setOpenCreateDrawer(false)}
+                open={openCreateDrawer}
+                styles={{
+                    body: {
+                        paddingBottom: 80,
+                    },
+                }}
+                extra={
+                    <Space>
+                        <Button onClick={() => setOpenCreateDrawer(false)}>Cancel</Button>
+                        <Button htmlType="submit" form="createComponentForm" type="primary">
+                            Submit
+                        </Button>
+                    </Space>
+                }
+            >
+                <Form layout="vertical" requiredMark={false}
+                    id="createComponentForm"
+                    onFinish={(nameObj) => {
+                        createComponent(nameObj);
+                        setOpenCreateDrawer(false);
+                    }}>
+                    <Row gutter={16}>
+                        <Col span={12}>
+                            <Form.Item
+                                name="name"
+                                label="Name"
+                                rules={[{ required: true, message: 'Nuovo nome del componente' }]}
+                            >
+                                <Input placeholder="Please enter user name" />
                             </Form.Item>
-                        </Form>
-                    </Card>
-                    )}
+                        </Col>
+                    </Row>
+                </Form>
+            </Drawer>
             </>
         )}
         </>
