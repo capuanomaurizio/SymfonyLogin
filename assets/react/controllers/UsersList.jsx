@@ -3,6 +3,10 @@ import React, {useEffect, useState} from 'react';
 import {Button, Space, Table, Tag} from 'antd';
 import {EditFilled, UserAddOutlined, UserDeleteOutlined} from "@ant-design/icons";
 
+function editUser(user) {
+    window.location.href = user;
+};
+
 const UsersList = () => {
 
     const [users, setUsers] = useState([]);
@@ -11,10 +15,6 @@ const UsersList = () => {
 
     const fetchUsers = async () => {
         setUsers(await apiRequest('userslist').finally(() => {setLoading(false)}));
-    };
-
-    function editUser(user) {
-        window.location.href = user;
     };
 
     useEffect(() => {
