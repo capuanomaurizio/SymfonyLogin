@@ -1,7 +1,7 @@
 import {Avatar, Button, Card, List, message, Space} from "antd";
 import {DeleteOutlined, EditOutlined, FileAddOutlined} from "@ant-design/icons";
 import React from "react";
-import {apiRequest} from "../utils";
+import {apiRequest} from "../../utils";
 
 const ProcessesList = ({processes, setProcesses, setHidden}) => {
 

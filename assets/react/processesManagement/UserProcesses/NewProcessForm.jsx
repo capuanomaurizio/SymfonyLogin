@@ -1,7 +1,7 @@
 import {Button, Card, Form, Input, message} from "antd";
 import {CloseOutlined} from "@ant-design/icons";
 import React from "react";
-import {apiRequest} from "../utils";
+import {apiRequest} from "../../utils";
 
 function createProcess(nameObj){
     apiRequest('createProcess', nameObj).then(result => {
