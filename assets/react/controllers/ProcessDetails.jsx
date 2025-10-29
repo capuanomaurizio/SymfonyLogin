@@ -1,13 +1,14 @@
 import {
-    Button, Card, Collapse, ConfigProvider, Form, Input, message, Steps, Drawer, Space, Col, Row, Dropdown
+    Button, Card, Collapse, ConfigProvider, Form, Input, message, Steps, Drawer, Space, Col, Row, Dropdown, List, Avatar
 } from "antd";
 import React, {useEffect, useState} from 'react';
 import {apiRequest} from "../utils";
-import {DeleteOutlined, DownOutlined, EditOutlined, FileAddOutlined} from "@ant-design/icons";
+import {DeleteOutlined, DownOutlined, EditOutlined, FileAddFilled, FileAddOutlined} from "@ant-design/icons";
 
 export default function ProcessDetails({ processId }) {
 
     const [componentToEdit, setComponentToEdit] = useState(null)
+    const [componentToEditFunctionalities, setComponentToEditFunctionalities] = useState([]);
     const [componentToCreate, setComponentToCreate] = useState(null)
     const [processes, setProcesses] = useState([]);
     const [refreshKey, setRefreshKey] = useState(0);
@@ -24,54 +25,56 @@ export default function ProcessDetails({ processId }) {
         return null;
     }
 
-    const transformComponent = (component) => ({
-        key: component.id,
-        label: component.name,
-        children: (
-            <>
-                {component.children_components?.length > 0 ? (
-                    <Collapse
-                        ghost
-                        items={component.children_components.map(transformComponent)}
-                    />
-                ) : ( <></> )}
-            </>
-        ),
-        extra: genExtra(component, component.id)
-    });
+    const transformComponent = (component) => {
+        const hasChildren = component.children_components?.length > 0;
+
+        return {
+            key: component.id,
+            label: component.name,
+            children: hasChildren ? (
+                <Collapse
+                    ghost
+                    items={component.children_components.map(transformComponent)}
+                />
+                ) : null,
+            extra: genExtra(component, component.id),
+            collapsible: hasChildren ? undefined : 'disabled'
+        }};
 
     function genExtra(component, id) {
         const items = [
             {
-                key: '1',
-                label: (
-                    <a onClick={(e) => {e.stopPropagation(); setComponentToEdit(findComponentById(component, id)); setOpenEditDrawer(true);}}>
-                        Modifica
-                    </a>
-                ),
+                key: 'edit',
+                label: 'Modifica',
                 icon: <EditOutlined />,
             },
             {
-                key: '2',
-                label: (
-                    <a onClick={(e) => {e.stopPropagation(); setComponentToCreate(findComponentById(component, id)); setOpenCreateDrawer(true);}}>
-                        Aggiungi
-                    </a>
-                ),
+                key: 'add',
+                label: 'Aggiungi',
                 icon: <FileAddOutlined />,
             },
             {
-                key: '3',
-                label: (
-                    <a target="_blank" rel="noopener noreferrer" href="https://www.aliyun.com">
-                        Elimina
-                    </a>
-                ),
+                key: 'delete',
+                label: 'Elimina',
                 icon: <DeleteOutlined/>,
             },
         ];
+
+        const handleMenuClick = ({ key, domEvent }) => {
+            domEvent.stopPropagation();
+            if (key === 'edit') {
+                setComponentToEdit(findComponentById(component, id));
+                setOpenEditDrawer(true);
+            } else if (key === 'add') {
+                setComponentToCreate(findComponentById(component, id));
+                setOpenCreateDrawer(true);
+            } else if (key === 'delete') {
+                // gestisci elimina qui
+            }
+        };
+
         return (
-            <Dropdown menu={{items}}>
+            <Dropdown menu={{ items, onClick: handleMenuClick }}>
                 <a onClick={e => e.stopPropagation()}>
                     <Space>
                         Opzioni
@@ -93,6 +96,10 @@ export default function ProcessDetails({ processId }) {
     useEffect(() => {
         fetchProcesses();
     }, [refreshKey]);
+
+    useEffect(()=>{
+        setComponentToEditFunctionalities(componentToEdit?.functionalities);
+    }, [componentToEdit])
 
     if (!processes || processes.length === 0) {
         return <p>Caricamento dei dettagli del processo...</p>;
@@ -143,7 +150,7 @@ export default function ProcessDetails({ processId }) {
             ]}
         />
         {current === 0 ? (
-            <Card title={"Processo "+process.id} style={{ minHeight: '35vh' }} key={refreshKey} >
+            <Card title={"Processo "+process.name} style={{ minHeight: '35vh' }} key={refreshKey} >
                 <Form
                     labelCol={{ span: 8 }}
                     wrapperCol={{ span: 16 }}
@@ -221,10 +228,33 @@ export default function ProcessDetails({ processId }) {
                         </Col>
                     </Row>
                 </Form>
+                <List
+                    header="Funzioni del componente"
+                    bordered
+                    itemLayout="horizontal"
+                    dataSource={componentToEditFunctionalities}
+                    renderItem={(item) => (
+                        <List.Item>
+                            <List.Item.Meta
+                                key={item.id}
+                                title={item.name}
+                            />
+                            <Space size={"middle"}>
+                                <Button variant="outlined" onClick={() => {window.location.href = "/collections/process/"+item.key}}>
+                                    <EditOutlined />
+                                </Button>
+                                <Button variant="outlined" color="danger">
+                                    <DeleteOutlined />
+                                </Button>
+                            </Space>
+                        </List.Item>
+                    )}
+                />
             </Drawer>
 
 
             <Drawer
+                key={refreshKey}
                 title={"Crea nuovo componente"}
                 width={920}
                 onClose={() => setOpenCreateDrawer(false)}
