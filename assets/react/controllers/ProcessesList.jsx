@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Avatar, Button, Card, Form, Input, List, message, Space} from "antd";
-import {DeleteOutlined, EditOutlined, FileAddFilled} from "@ant-design/icons";
+import {CloseOutlined, DeleteOutlined, EditOutlined, FileAddOutlined} from "@ant-design/icons";
 import {apiRequest} from "../utils";
 
 const transformProcesses = (processes) =>
@@ -49,7 +49,16 @@ export default function ProcessesList() {
 
     return (
         <>
-        <Card title="Lista dei processi dell'utente" style={{ marginBottom: '1rem' }} >
+        <Card
+            title="Lista dei processi dell'utente"
+            style={{ marginBottom: '1rem' }}
+            extra={
+                <Button variant="solid" color="green" onClick={() => {setHidden(false)}}>
+                    Nuovo processo
+                    <FileAddOutlined />
+                </Button>
+            }
+        >
             <List
                 itemLayout="horizontal"
                 dataSource={processes}
@@ -70,18 +79,17 @@ export default function ProcessesList() {
                         </Space>
                     </List.Item>
                 )}
-            >
-                <List.Item>
-                    <List.Item.Meta
-                        title="Crea un nuovo processo"
-                    />
-                    <Button variant="solid" color="green" onClick={() => {setHidden(false)}}>
-                        <FileAddFilled />
-                    </Button>
-                </List.Item>
-            </List>
+            />
         </Card>
-        <Card title="Crea nuovo processo" hidden={hidden} >
+        <Card
+            title="Crea nuovo processo"
+            hidden={hidden}
+            extra={
+                <Button variant="dashed" onClick={() => {setHidden(true)}}>
+                    <CloseOutlined />
+                </Button>
+            }
+        >
             <Form
                 labelCol={{ span: 8 }}
                 wrapperCol={{ span: 16 }}
