@@ -95,4 +95,10 @@ class Component
         return $this;
     }
 
+    public function removeFunctionality(Functionality $functionality): Component
+    {
+        $this->functionalities->removeElement($functionality);
+        return $this;
+    }
+
 }
