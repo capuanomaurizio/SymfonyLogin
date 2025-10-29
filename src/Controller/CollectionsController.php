@@ -4,29 +4,19 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Document\Process;
-use App\Service\DynamicUserDatabaseManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Serializer\Exception\ExceptionInterface;
-use Symfony\Component\Serializer\SerializerInterface;
 
 class CollectionsController extends AbstractController
 {
 
-    /**
-     * @throws ExceptionInterface
-     */
     #[Route('/collections/processes')]
     public function processesList(): Response
     {
         return $this->render('processes.html.twig');
     }
 
-    /**
-     * @throws ExceptionInterface
-     */
     #[Route('/collections/process/{id}', name: 'process_route')]
     public function processTree(string $id): Response
     {
