@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Document\Component;
+use App\Document\Functionality;
 use App\Document\Process;
 use App\Document\User;
 use Doctrine\ODM\MongoDB\DocumentManager;
