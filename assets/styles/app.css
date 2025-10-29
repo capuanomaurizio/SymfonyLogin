@@ -6,3 +6,9 @@ body{
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
 }
+
+.ant-collapse-collapsible-disabled {
+    cursor: default !important;
+    color: rgba(0, 0, 0, 0.88) !important;
+    background-color: #fff !important;
+}
