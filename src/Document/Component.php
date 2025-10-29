@@ -25,6 +25,10 @@ class Component
     #[Groups(['process:read'])]
     private Collection $children_components;
 
+    #[ODM\ReferenceMany(storeAs: 'dbRef', targetDocument: Functionality::class, cascade: ['persist', 'remove'])]
+    #[Groups(['process:read'])]
+    private Collection $functionalities;
+
     public function __construct()
     {
         $this->children_components = new ArrayCollection();
@@ -88,5 +92,22 @@ class Component
         return $this;
     }
 
+    public function getFunctionalities(): Collection
+    {
+        return $this->functionalities;
+    }
+
+    public function setFunctionalities(Collection $functionalities): Component
+    {
+        $this->functionalities = $functionalities;
+        return $this;
+    }
+
+    public function addFunctionality(Functionality $functionality): Component
+    {
+        if (!$this->functionalities->contains($functionality))
+            $this->functionalities->add($functionality);
+        return $this;
+    }
 
 }
