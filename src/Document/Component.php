@@ -18,9 +18,6 @@ class Component
     #[Groups(['process:read'])]
     private string $name;
 
-    #[ODM\ReferenceOne(storeAs: 'dbRef', targetDocument: Component::class, cascade: ['persist', 'remove'])]
-    private ?Component $parent_component = null;
-
     #[ODM\ReferenceMany(storeAs: 'dbRef', targetDocument: Component::class, cascade: ['persist', 'remove'])]
     #[Groups(['process:read'])]
     private Collection $children_components;
@@ -55,18 +52,6 @@ class Component
         $this->name = $name;
         return $this;
     }
-
-    public function getParentComponent(): ?Component
-    {
-        return $this->parent_component;
-    }
-
-    public function setParentComponent(?Component $parent_component): Component
-    {
-        $this->parent_component = $parent_component;
-        return $this;
-    }
-
 
     public function getChildrenComponents(): Collection
     {

@@ -110,7 +110,7 @@ class ApiController extends AbstractController
     {
         $data = $request->getPayload();
         $parentComponent = $this->documentManager->getRepository(Component::class)->findOneBy(['id' => $data->get('parent_id')]);
-        $component = (new Component())->setName($data->get('name'))->setParentComponent($parentComponent);
+        $component = (new Component())->setName($data->get('name'));
         $parentComponent->addChildComponent($component);
         $this->documentManager->persist($component);
         $this->documentManager->persist($parentComponent);
