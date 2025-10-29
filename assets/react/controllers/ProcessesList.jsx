@@ -19,8 +19,6 @@ function createProcess(nameObj){
     }).catch(console.error);
 }
 
-
-
 export default function ProcessesList() {
 
     const [processes, setProcesses] = useState([]);
