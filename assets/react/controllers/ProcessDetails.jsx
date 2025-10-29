@@ -55,7 +55,7 @@ export default function ProcessDetails({ processId }) {
                 key: '2',
                 label: (
                     <a onClick={(e) => {e.stopPropagation(); setComponentToCreate(findComponentById(component, id)); setOpenCreateDrawer(true);}}>
-                        Aggiungi figlio
+                        Aggiungi
                     </a>
                 ),
                 icon: <FileAddOutlined />,
@@ -213,7 +213,7 @@ export default function ProcessDetails({ processId }) {
                         <Col span={12}>
                             <Form.Item
                                 name="name"
-                                label="Name"
+                                label="Nome"
                                 rules={[{ required: true, message: 'Non lasciare il campo vuoto' }]}
                             >
                                 <Input placeholder="Nuovo nome del componente" />
@@ -253,10 +253,10 @@ export default function ProcessDetails({ processId }) {
                         <Col span={12}>
                             <Form.Item
                                 name="name"
-                                label="Name"
-                                rules={[{ required: true, message: 'Nuovo nome del componente' }]}
+                                label="Nome"
+                                rules={[{ required: true, message: 'Non lasciare il campo vuoto' }]}
                             >
-                                <Input placeholder="Please enter user name" />
+                                <Input placeholder="Nome del nuovo componente" />
                             </Form.Item>
                         </Col>
                     </Row>
