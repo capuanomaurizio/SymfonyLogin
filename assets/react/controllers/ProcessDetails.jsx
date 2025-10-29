@@ -8,13 +8,15 @@ import {DeleteOutlined, DownOutlined, EditOutlined, FileAddFilled, FileAddOutlin
 export default function ProcessDetails({ processId }) {
 
     const [componentToEdit, setComponentToEdit] = useState(null)
-    const [componentToEditFunctionalities, setComponentToEditFunctionalities] = useState([]);
+    const [functionToEdit, setFunctionToEdit] = useState(null)
     const [componentToCreate, setComponentToCreate] = useState(null)
     const [processes, setProcesses] = useState([]);
     const [refreshKey, setRefreshKey] = useState(0);
     const [current, setCurrent] = useState(0);
     const [openEditDrawer, setOpenEditDrawer] = useState(false);
     const [openCreateDrawer, setOpenCreateDrawer] = useState(false);
+    const [openEditFunctionDrawer, setOpenEditFunctionDrawer] = useState(false);
+    const [openNewFunctionDrawer, setOpenNewFunctionDrawer] = useState(false);
 
     function findComponentById(component, id) {
         if (component.id === id) return component;
@@ -25,9 +27,18 @@ export default function ProcessDetails({ processId }) {
         return null;
     }
 
+    function findParentComponent(component, childId) {
+        if (!component?.children_components) return null;
+        for (const child of component.children_components) {
+            if (child.id === childId) return component;
+            const found = findParentComponent(child, childId);
+            if (found) return found;
+        }
+        return null;
+    }
+
     const transformComponent = (component) => {
         const hasChildren = component.children_components?.length > 0;
-
         return {
             key: component.id,
             label: component.name,
@@ -59,17 +70,16 @@ export default function ProcessDetails({ processId }) {
                 icon: <DeleteOutlined/>,
             },
         ];
-
         const handleMenuClick = ({ key, domEvent }) => {
             domEvent.stopPropagation();
             if (key === 'edit') {
-                setComponentToEdit(findComponentById(component, id));
+                setComponentToEdit(component);
                 setOpenEditDrawer(true);
             } else if (key === 'add') {
-                setComponentToCreate(findComponentById(component, id));
+                setComponentToCreate(component);
                 setOpenCreateDrawer(true);
             } else if (key === 'delete') {
-                // gestisci elimina qui
+                deleteComponent(process.component, id)
             }
         };
 
@@ -97,10 +107,6 @@ export default function ProcessDetails({ processId }) {
         fetchProcesses();
     }, [refreshKey]);
 
-    useEffect(()=>{
-        setComponentToEditFunctionalities(componentToEdit?.functionalities);
-    }, [componentToEdit])
-
     if (!processes || processes.length === 0) {
         return <p>Caricamento dei dettagli del processo...</p>;
     }
@@ -114,21 +120,58 @@ export default function ProcessDetails({ processId }) {
     const treeData = process.component ? [transformComponent(process.component)] : [];
 
     async function editProcess(nameObj) {
-        await apiRequest('editProcess', {'id' : process.id, 'new_name': nameObj.name});
+        await apiRequest('editProcess', {'id': process.id, 'new_name': nameObj.name});
         setRefreshKey(refreshKey + 1);
         message.success("Nome del processo modificato!")
     }
 
+    async function createComponent(nameObj) {
+        await apiRequest('createComponent', {'parent_id': componentToCreate.id, 'name': nameObj.name});
+        setRefreshKey(refreshKey + 1);
+        message.success("Componente creato!");
+    }
+
     async function editComponent(nameObj) {
-        await apiRequest('editComponent', {'id' : componentToEdit.id, 'new_name': nameObj.name});
+        await apiRequest('editComponent', {'id': componentToEdit.id, 'new_name': nameObj.name});
         setRefreshKey(refreshKey + 1);
         message.success("Nome del componente modificato!");
     }
 
-    async function createComponent(nameObj) {
-        await apiRequest('createComponent', {'parent_id' : componentToCreate.id, 'name': nameObj.name});
+    async function deleteComponent(root, id) {
+        const parent = findParentComponent(root, id)
+        await apiRequest('deleteComponent', {'parent_id': parent.id, 'id': id});
         setRefreshKey(refreshKey + 1);
-        message.success("Componente creato!");
+        message.success("Componente eliminato!");
+    }
+
+    async function createFunction(nameObj) {
+        setOpenNewFunctionDrawer(false);
+        const newFunction = await apiRequest('createFunction', {'component_id': componentToEdit.id, 'name': nameObj.name});
+        setComponentToEdit(prev => ({
+            ...prev,
+            functionalities: [...prev.functionalities, newFunction]
+        }));
+        message.success("Funzione aggiunta al componente!");
+    }
+
+    async function editFunction(nameObj) {
+        await apiRequest('editFunction', {'id': functionToEdit.id, 'new_name': nameObj.name});
+        setComponentToEdit(prev => ({
+            ...prev,
+            functionalities: prev.functionalities.map(f =>
+                f.id === functionToEdit.id ? { ...f, name: nameObj.name } : f
+            ),
+        }));
+        message.success("Nome della funzione modificato!");
+    }
+
+    async function deleteFunction(id) {
+        await apiRequest('deleteFunction', {'component_id': componentToEdit.id, 'function_id': id});
+        setComponentToEdit(prev => ({
+            ...prev,
+            functionalities: prev.functionalities.filter(f => f.id !== id)
+        }));
+        message.success("Funzione rimossa dal componente!");
     }
 
     return (
@@ -193,13 +236,8 @@ export default function ProcessDetails({ processId }) {
                 key={refreshKey}
                 title={"Modifica componente "+componentToEdit?.name}
                 width={920}
-                onClose={() => setOpenEditDrawer(false)}
+                onClose={() => {setOpenEditDrawer(false); setRefreshKey(refreshKey+1)}}
                 open={openEditDrawer}
-                styles={{
-                    body: {
-                        paddingBottom: 80,
-                    },
-                }}
                 extra={
                     <Space>
                         <Button onClick={() => setOpenEditDrawer(false)}>Cancel</Button>
@@ -229,10 +267,18 @@ export default function ProcessDetails({ processId }) {
                     </Row>
                 </Form>
                 <List
-                    header="Funzioni del componente"
+                    header={
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <b>Funzioni del componente</b>
+                            <Button variant="solid" color="green" onClick={() => setOpenNewFunctionDrawer(true)}>
+                                Nuova funzione
+                                <FileAddOutlined />
+                            </Button>
+                        </div>
+                    }
                     bordered
                     itemLayout="horizontal"
-                    dataSource={componentToEditFunctionalities}
+                    dataSource={componentToEdit?.functionalities || []}
                     renderItem={(item) => (
                         <List.Item>
                             <List.Item.Meta
@@ -240,30 +286,95 @@ export default function ProcessDetails({ processId }) {
                                 title={item.name}
                             />
                             <Space size={"middle"}>
-                                <Button variant="outlined" onClick={() => {window.location.href = "/collections/process/"+item.key}}>
+                                <Button variant="outlined" onClick={() => {
+                                    setFunctionToEdit(componentToEdit?.functionalities.find(obj => obj.id === item.id));
+                                    setOpenEditFunctionDrawer(true)
+                                }}>
                                     <EditOutlined />
                                 </Button>
-                                <Button variant="outlined" color="danger">
+                                <Button variant="outlined" color="danger" onClick={ () => deleteFunction(item.id) }>
                                     <DeleteOutlined />
                                 </Button>
                             </Space>
                         </List.Item>
                     )}
                 />
+                <Drawer
+                    title={"Modifica funzione "+functionToEdit?.name}
+                    width={620}
+                    closable={false}
+                    onClose={() => setOpenEditFunctionDrawer(false)}
+                    open={openEditFunctionDrawer}
+                    extra={
+                        <Space>
+                            <Button onClick={() => setOpenEditFunctionDrawer(false)}>Cancel</Button>
+                            <Button htmlType="submit" form="editFunctionForm" type="primary">
+                                Submit
+                            </Button>
+                        </Space>
+                    }
+                >
+                    <Form layout="vertical" requiredMark={false}
+                          id="editFunctionForm"
+                          onFinish={(nameObj) => {
+                              editFunction(nameObj);
+                              setOpenEditFunctionDrawer(false);
+                          }}>
+                        <Row gutter={16}>
+                            <Col span={12}>
+                                <Form.Item
+                                    name="name"
+                                    label="Nome"
+                                    rules={[{ required: true, message: 'Non lasciare il campo vuoto' }]}
+                                >
+                                    <Input placeholder="Nuovo nome della funzione" />
+                                </Form.Item>
+                            </Col>
+                        </Row>
+                    </Form>
+                </Drawer>
             </Drawer>
-
-
             <Drawer
-                key={refreshKey}
+                key={openNewFunctionDrawer-5}
+                title={"Nuova funzione di "+componentToEdit?.name}
+                width={620}
+                closable={false}
+                onClose={() => setOpenNewFunctionDrawer(false)}
+                open={openNewFunctionDrawer}
+                extra={
+                    <Space>
+                        <Button onClick={() => setOpenNewFunctionDrawer(false)}>Cancel</Button>
+                        <Button htmlType="submit" form="newFunctionForm" type="primary">
+                            Submit
+                        </Button>
+                    </Space>
+                }
+            >
+                <Form layout="vertical" requiredMark={false}
+                      id="newFunctionForm"
+                      onFinish={(nameObj) => {
+                          createFunction(nameObj);
+                          setOpenEditFunctionDrawer(false);
+                      }}>
+                    <Row gutter={16}>
+                        <Col span={12}>
+                            <Form.Item
+                                name="name"
+                                label="Nome"
+                                rules={[{ required: true, message: 'Non lasciare il campo vuoto' }]}
+                            >
+                                <Input placeholder="Nome della funzione" />
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                </Form>
+            </Drawer>
+            <Drawer
+                key={refreshKey+1}
                 title={"Crea nuovo componente"}
                 width={920}
                 onClose={() => setOpenCreateDrawer(false)}
                 open={openCreateDrawer}
-                styles={{
-                    body: {
-                        paddingBottom: 80,
-                    },
-                }}
                 extra={
                     <Space>
                         <Button onClick={() => setOpenCreateDrawer(false)}>Cancel</Button>
