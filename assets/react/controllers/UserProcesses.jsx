@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {apiRequest} from "../utils";
-import NewProcessForm from "../processesManagement/NewProcessForm";
-import ProcessesList from "../processesManagement/ProcessesList";
+import NewProcessForm from "../processesManagement/UserProcesses/NewProcessForm";
+import ProcessesList from "../processesManagement/UserProcesses/ProcessesList";
 
 const transformProcesses = (processes) =>
     processes.map((process) => ({
