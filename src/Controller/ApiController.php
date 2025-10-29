@@ -128,5 +128,55 @@ class ApiController extends AbstractController
         $this->documentManager->flush();
         return $this->json([]);
     }
+
+    #[Route('/api/deleteComponent', methods: ['POST'])]
+    public function deleteComponent(Request $request): Response
+    {
+        $data = $request->getPayload();
+        $parent = $this->documentManager->getRepository(Component::class)->findOneBy(['id' => $data->get('parent_id')]);
+        $child = $this->documentManager->getRepository(Component::class)->findOneBy(['id' => $data->get('id')]);
+        $parent->removeChildComponent($child);
+        $this->documentManager->persist($parent);
+        $this->documentManager->flush();
+        return $this->json([]);
+    }
+
+    #[Route('/api/createFunction', methods: ['POST'])]
+    public function createFunction(Request $request): Response
+    {
+        $data = $request->getPayload();
+        $component = $this->documentManager->getRepository(Component::class)->findOneBy(['id' => $data->get('component_id')]);
+        $function = (new Functionality())->setName($data->get('name'));
+        $component->addFunctionality($function);
+        $this->documentManager->persist($function);
+        $this->documentManager->persist($component);
+        $this->documentManager->flush();
+        return $this->json($function);
+    }
+
+    #[Route('/api/editFunction', methods: ['POST'])]
+    public function editFunction(Request $request): Response
+    {
+        $data = $request->getPayload();
+        $function = $this->documentManager->getRepository(Functionality::class)->findOneBy(['id' => $data->get('id')]);
+        $function->setName($data->get('new_name'));
+        $this->documentManager->persist($function);
+        $this->documentManager->flush();
+        return $this->json([]);
+    }
+
+    #[Route('/api/deleteFunction', methods: ['POST'])]
+    public function deleteFunction(Request $request): Response
+    {
+        $data = $request->getPayload();
+        $component = $this->documentManager->getRepository(Component::class)->findOneBy(['id' => $data->get('component_id')]);
+        $function = $this->documentManager->getRepository(Functionality::class)->findOneBy(['id' => $data->get('function_id')]);
+        $component->removeFunctionality($function);
+        $this->documentManager->persist($component);
+        $this->documentManager->flush();
+        return $this->json([]);
+    }
+
+
 }
 
