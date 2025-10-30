@@ -1,6 +1,7 @@
 import {Button, Col, Drawer, Form, Input, List, Row, Space, message} from "antd";
 import {DeleteOutlined, EditOutlined, FileAddOutlined} from "@ant-design/icons";
 import {apiRequest} from "../../utils";
+import {useEffect} from "react";
 
 function updateRoot(component, idToUpdate, updatedFields) {
     if (component.id === idToUpdate) return { ...component, ...updatedFields };
@@ -12,7 +13,7 @@ function updateRoot(component, idToUpdate, updatedFields) {
     return component;
 }
 
-const EditComponentDrawer = ({componentToEdit, setComponentToEdit, functionToEdit, setFunctionToEdit, openEditDrawer, setOpenEditDrawer,
+const EditComponentDrawer = ({componentToEdit, setComponentToEdit, functionToEdit, setFunctionToEdit, openEditDrawer, setOpenEditDrawer, functionToDelete,
                              openNewFunctionDrawer, setOpenNewFunctionDrawer, openEditFunctionDrawer, setOpenEditFunctionDrawer, setProcess}) => {
 
     async function editComponent(values) {
@@ -22,54 +23,86 @@ const EditComponentDrawer = ({componentToEdit, setComponentToEdit, functionToEdi
                 ...prev,
                 component: updateRoot(prev.component, componentToEdit.id, values)
             }));
-            message.success("Nome del componente modificato!");
+            message.success("Componente modificato!");
         }
         catch (e) {
-            message.error("Nome del componente non modificato");
+            message.error("Componente non modificato");
         }
     }
 
     async function createFunction(values) {
-        setOpenNewFunctionDrawer(false);
-        const newFunction = await apiRequest('createFunction', {'component_id': componentToEdit.id, 'name': values.name});
-        setComponentToEdit(prev => ({
-            ...prev,
-            functionalities: [...prev.functionalities, newFunction]
-        }));
-        setProcess(prev => ({
-            ...prev,
-            component: updateRoot(prev.component, componentToEdit.id, componentToEdit)
-        }));
-        message.success("Funzione aggiunta al componente!");
+        try {
+            setOpenNewFunctionDrawer(false);
+            const newFunction = await apiRequest('createFunction', {
+                'component_id': componentToEdit.id,
+                'name': values.name
+            });
+            setComponentToEdit(prev => {
+                const updatedComponent = {
+                    ...prev,
+                    functionalities: [...prev.functionalities, newFunction]
+                };
+                setProcess(prev => ({
+                    ...prev,
+                    component: updateRoot(prev.component, componentToEdit.id, updatedComponent)
+                }));
+                return updatedComponent;
+            });
+            message.success("Funzionalità aggiunta al componente!");
+        }
+        catch (e) {
+            message.error("Funzionalità non aggiunta al componente")
+        }
     }
 
     async function editFunction(values) {
-        await apiRequest('editFunction', {'id': functionToEdit.id, 'new_name': values.name});
-        setComponentToEdit(prev => ({
-            ...prev,
-            functionalities: prev.functionalities.map(f =>
-                f.id === functionToEdit.id ? { ...f, name: values.name } : f
-            ),
-        }));
-        setProcess(prev => ({
-            ...prev,
-            component: updateRoot(prev.component, componentToEdit.id, componentToEdit)
-        }));
-        message.success("Nome della funzione modificato!");
+        try {
+            await apiRequest('editFunction', {'id': functionToEdit.id, 'new_name': values.name});
+            setComponentToEdit(prev => {
+                const updatedComponent = {
+                    ...prev,
+                    functionalities: prev.functionalities.map(f =>
+                        f.id === functionToEdit.id ? {...f, name: values.name} : f
+                    ),
+                };
+                setProcess(prev => ({
+                    ...prev,
+                    component: updateRoot(prev.component, componentToEdit.id, updatedComponent)
+                }));
+                return updatedComponent;
+            });
+            message.success("Funzionalità del componente modificata!");
+        }
+        catch (e) {
+            message.error("Funzionalità del componente non modificata")
+        }
     }
 
     async function deleteFunction(id) {
-        await apiRequest('deleteFunction', {'component_id': componentToEdit.id, 'function_id': id});
-        setComponentToEdit(prev => ({
-            ...prev,
-            functionalities: prev.functionalities.filter(f => f.id !== id)
-        }));
-        setProcess(prev => ({
-            ...prev,
-            component: updateRoot(prev.component, componentToEdit.id, componentToEdit)
-        }));
-        message.success("Funzione rimossa dal componente!");
+        try {
+            await apiRequest('deleteFunction', {'component_id': componentToEdit.id, 'function_id': id});
+            setComponentToEdit(prev => {
+                const updatedComponent = {
+                    ...prev,
+                    functionalities: prev.functionalities.filter(f => f.id !== id)
+                };
+                setProcess(prev => ({
+                    ...prev,
+                    component: updateRoot(prev.component, componentToEdit.id, updatedComponent)
+                }));
+                return updatedComponent;
+            });
+            message.success("Funzione rimossa dal componente!");
+        }
+        catch (e) {
+            message.error("Funzionalità non rimossa dal componente")
+        }
     }
+
+    useEffect(() => {
+        if(functionToDelete)
+            deleteFunction(functionToDelete.id);
+    }, [functionToDelete])
 
     return(
         <Drawer

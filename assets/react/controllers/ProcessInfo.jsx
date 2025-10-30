@@ -14,6 +14,7 @@ export default function ProcessInfo({ processId }) {
 
     const [componentToEdit, setComponentToEdit] = useState(null)
     const [functionToEdit, setFunctionToEdit] = useState(null)
+    const [functionToDelete, setFunctionToDelete] = useState(null)
     const [parentOfComponentToCreate, setParentOfComponentToCreate] = useState(null)
 
     const [openEditDrawer, setOpenEditDrawer] = useState(false);
@@ -53,6 +54,9 @@ export default function ProcessInfo({ processId }) {
                 setOpenEditDrawer={setOpenEditDrawer}
                 setParentOfComponentToCreate={setParentOfComponentToCreate}
                 setOpenCreateDrawer={setOpenCreateDrawer}
+                setOpenEditFunctionDrawer={setOpenEditFunctionDrawer}
+                setFunctionToEdit={setFunctionToEdit}
+                setFunctionToDelete={setFunctionToDelete}
             ></ComponentsTree>
             <EditComponentDrawer
                 componentToEdit={componentToEdit}
@@ -66,6 +70,7 @@ export default function ProcessInfo({ processId }) {
                 openEditFunctionDrawer={openEditFunctionDrawer}
                 setOpenEditFunctionDrawer={setOpenEditFunctionDrawer}
                 setProcess={setProcess}
+                functionToDelete={functionToDelete}
             ></EditComponentDrawer>
             <CreateComponentDrawer
                 parentOfComponentToCreate={parentOfComponentToCreate}
