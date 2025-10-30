@@ -93,7 +93,7 @@ class ApiController extends AbstractController
         $process->setName($data->get('new_name'));
         $this->documentManager->persist($process);
         $this->documentManager->flush();
-        return $this->json([]);
+        return $this->json($process);
     }
 
     #[Route('/api/deleteProcess', methods: ['POST'])]
@@ -116,7 +116,7 @@ class ApiController extends AbstractController
         $this->documentManager->persist($component);
         $this->documentManager->persist($parentComponent);
         $this->documentManager->flush();
-        return $this->json([]);
+        return $this->json($component);
     }
 
     #[Route('/api/editComponent', methods: ['POST'])]
