@@ -9,6 +9,7 @@ use App\Document\Functionality;
 use App\Document\Process;
 use App\Document\User;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ODM\MongoDB\MongoDBException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -73,11 +74,26 @@ class ApiController extends AbstractController
         return $this->json($this->serializer->serialize($processes, 'json', ['groups' => ['process:read']]));
     }
 
+    #[Route('/api/componentsList', methods: ['POST'])]
+    public function componentsList(): JsonResponse
+    {
+        $components = $this->documentManager->getRepository(Component::class)->findAll();
+        return $this->json($this->serializer->serialize($components, 'json', ['groups' => ['process:read']]));
+    }
+
+    /**
+     * @throws \Throwable
+     * @throws MongoDBException
+     */
     #[Route('/api/createProcess', methods: ['POST'])]
     public function createProcess(Request $request): Response
     {
         $data = $request->getPayload();
-        $process = (new Process())->setName($data->get('name'));
+        $rootComponent = $this->documentManager->getRepository(Component::class)->findOneBy(['id' => $data->get('rootId')]);
+        $process = (new Process())->setName($data->get('name'))
+            ->setContextInformation($data->get('contextInformation'))
+            ->setExpirationDate(new \DateTime($data->get('expirationDate')))
+            ->setComponent($rootComponent);
         $this->documentManager->persist($process);
         $this->documentManager->flush();
         return $this->json([
@@ -85,12 +101,20 @@ class ApiController extends AbstractController
         ]);
     }
 
+    /**
+     * @throws MongoDBException
+     * @throws \Throwable
+     */
     #[Route('/api/editProcess', methods: ['POST'])]
     public function editProcess(Request $request): Response
     {
-        $data = $request->getPayload();
-        $process = $this->documentManager->getRepository(Process::class)->findOneBy(['id' => $data->get('id')]);
-        $process->setName($data->get('new_name'));
+        $data = json_decode($request->getContent(), true);
+        $values = $data['values'];
+        $process = $this->documentManager->getRepository(Process::class)->findOneBy(['id' => $data['id']]);
+        $process->setName($values['name'])
+            ->setContextInformation($values['contextInformation'])
+            ->setExpirationDate(new \DateTime($values['expirationDate']));
+        //dd($this->json($process));
         $this->documentManager->persist($process);
         $this->documentManager->flush();
         return $this->json($process);
@@ -110,7 +134,7 @@ class ApiController extends AbstractController
     public function createComponent(Request $request): Response
     {
         $data = $request->getPayload();
-        $parentComponent = $this->documentManager->getRepository(Component::class)->findOneBy(['id' => $data->get('parent_id')]);
+        $parentComponent = $this->documentManager->getRepository(Component::class)->findOneBy(['id' => $data->get('parentId')]);
         $component = (new Component())->setName($data->get('name'));
         $parentComponent->addChildComponent($component);
         $this->documentManager->persist($component);
@@ -124,7 +148,7 @@ class ApiController extends AbstractController
     {
         $data = $request->getPayload();
         $component = $this->documentManager->getRepository(Component::class)->findOneBy(['id' => $data->get('id')]);
-        $component->setName($data->get('new_name'));
+        $component->setName($data->get('newName'));
         $this->documentManager->persist($component);
         $this->documentManager->flush();
         return $this->json([]);
@@ -134,7 +158,7 @@ class ApiController extends AbstractController
     public function deleteComponent(Request $request): Response
     {
         $data = $request->getPayload();
-        $parent = $this->documentManager->getRepository(Component::class)->findOneBy(['id' => $data->get('parent_id')]);
+        $parent = $this->documentManager->getRepository(Component::class)->findOneBy(['id' => $data->get('parentId')]);
         $child = $this->documentManager->getRepository(Component::class)->findOneBy(['id' => $data->get('id')]);
         $parent->removeChildComponent($child);
         $this->documentManager->persist($parent);
@@ -146,7 +170,7 @@ class ApiController extends AbstractController
     public function createFunction(Request $request): Response
     {
         $data = $request->getPayload();
-        $component = $this->documentManager->getRepository(Component::class)->findOneBy(['id' => $data->get('component_id')]);
+        $component = $this->documentManager->getRepository(Component::class)->findOneBy(['id' => $data->get('componentId')]);
         $function = (new Functionality())->setName($data->get('name'));
         $component->addFunctionality($function);
         $this->documentManager->persist($function);
@@ -160,7 +184,7 @@ class ApiController extends AbstractController
     {
         $data = $request->getPayload();
         $function = $this->documentManager->getRepository(Functionality::class)->findOneBy(['id' => $data->get('id')]);
-        $function->setName($data->get('new_name'));
+        $function->setName($data->get('newName'));
         $this->documentManager->persist($function);
         $this->documentManager->flush();
         return $this->json([]);
@@ -170,14 +194,13 @@ class ApiController extends AbstractController
     public function deleteFunction(Request $request): Response
     {
         $data = $request->getPayload();
-        $component = $this->documentManager->getRepository(Component::class)->findOneBy(['id' => $data->get('component_id')]);
-        $function = $this->documentManager->getRepository(Functionality::class)->findOneBy(['id' => $data->get('function_id')]);
+        $component = $this->documentManager->getRepository(Component::class)->findOneBy(['id' => $data->get('componentId')]);
+        $function = $this->documentManager->getRepository(Functionality::class)->findOneBy(['id' => $data->get('functionId')]);
         $component->removeFunctionality($function);
         $this->documentManager->persist($component);
         $this->documentManager->flush();
         return $this->json([]);
     }
-
 
 }
 

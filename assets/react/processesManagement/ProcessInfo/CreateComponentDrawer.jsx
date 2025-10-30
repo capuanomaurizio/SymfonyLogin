@@ -3,9 +3,9 @@ import React from "react";
 import {apiRequest} from "../../utils";
 
 function updateRoot(component, parentId, newComponent) {
-    if (component.id === parentId) return { ...component, children_components: [...component.children_components, newComponent] };
-    if (component.children_components && component.children_components.length > 0) {
-        component.children_components = component.children_components
+    if (component.id === parentId) return { ...component, childrenComponents: [...component.childrenComponents, newComponent] };
+    if (component.childrenComponents && component.childrenComponents.length > 0) {
+        component.childrenComponents = component.childrenComponents
             .map(child => updateRoot(child, parentId, newComponent))
             .filter(child => child !== null);
     }
@@ -15,7 +15,7 @@ function updateRoot(component, parentId, newComponent) {
 const CreateComponentDrawer = ({parentOfComponentToCreate, openCreateDrawer, setOpenCreateDrawer, setProcess}) => {
 
     async function createComponent(values) {
-        const newComponent = await apiRequest('createComponent', {'parent_id': parentOfComponentToCreate.id, 'name': values.name});
+        const newComponent = await apiRequest('createComponent', {'parentId': parentOfComponentToCreate.id, 'name': values.name});
         setProcess(prev => ({
             ...prev,
             component: updateRoot(prev.component, parentOfComponentToCreate.id, newComponent)

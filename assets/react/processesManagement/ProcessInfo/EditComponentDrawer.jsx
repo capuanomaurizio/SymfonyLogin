@@ -5,8 +5,8 @@ import {useEffect} from "react";
 
 function updateRoot(component, idToUpdate, updatedFields) {
     if (component.id === idToUpdate) return { ...component, ...updatedFields };
-    if (component.children_components && component.children_components.length > 0) {
-        component.children_components = component.children_components
+    if (component.childrenComponents && component.childrenComponents.length > 0) {
+        component.childrenComponents = component.childrenComponents
             .map(child => updateRoot(child, idToUpdate, updatedFields))
             .filter(child => child !== null);
     }
@@ -18,7 +18,7 @@ const EditComponentDrawer = ({componentToEdit, setComponentToEdit, functionToEdi
 
     async function editComponent(values) {
         try{
-            await apiRequest('editComponent', {'id': componentToEdit.id, 'new_name': values.name});
+            await apiRequest('editComponent', {'id': componentToEdit.id, 'newName': values.name});
             setProcess(prev => ({
                 ...prev,
                 component: updateRoot(prev.component, componentToEdit.id, values)
@@ -34,7 +34,7 @@ const EditComponentDrawer = ({componentToEdit, setComponentToEdit, functionToEdi
         try {
             setOpenNewFunctionDrawer(false);
             const newFunction = await apiRequest('createFunction', {
-                'component_id': componentToEdit.id,
+                'componentId': componentToEdit.id,
                 'name': values.name
             });
             setComponentToEdit(prev => {
@@ -57,7 +57,7 @@ const EditComponentDrawer = ({componentToEdit, setComponentToEdit, functionToEdi
 
     async function editFunction(values) {
         try {
-            await apiRequest('editFunction', {'id': functionToEdit.id, 'new_name': values.name});
+            await apiRequest('editFunction', {'id': functionToEdit.id, 'newName': values.name});
             setComponentToEdit(prev => {
                 const updatedComponent = {
                     ...prev,
@@ -80,7 +80,7 @@ const EditComponentDrawer = ({componentToEdit, setComponentToEdit, functionToEdi
 
     async function deleteFunction(id) {
         try {
-            await apiRequest('deleteFunction', {'component_id': componentToEdit.id, 'function_id': id});
+            await apiRequest('deleteFunction', {'componentId': componentToEdit.id, 'functionId': id});
             setComponentToEdit(prev => {
                 const updatedComponent = {
                     ...prev,

@@ -46,7 +46,7 @@ const UsersList = () => {
         {
             title: 'Data registrazione',
             dataIndex: 'createdAt',
-            key: 'data_registrazione',
+            key: 'dataRegistrazione',
         },
         {
             title: 'Ruoli',

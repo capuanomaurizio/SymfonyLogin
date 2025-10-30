@@ -20,7 +20,7 @@ class Component
 
     #[ODM\ReferenceMany(storeAs: 'dbRef', targetDocument: Component::class, cascade: ['persist', 'remove'])]
     #[Groups(['process:read'])]
-    private Collection $children_components;
+    private Collection $childrenComponents;
 
     #[ODM\ReferenceMany(storeAs: 'dbRef', targetDocument: Functionality::class, cascade: ['persist', 'remove'])]
     #[Groups(['process:read'])]
@@ -28,7 +28,7 @@ class Component
 
     public function __construct()
     {
-        $this->children_components = new ArrayCollection();
+        $this->childrenComponents = new ArrayCollection();
     }
 
     public function getId(): ?string
@@ -55,25 +55,25 @@ class Component
 
     public function getChildrenComponents(): Collection
     {
-        return $this->children_components;
+        return $this->childrenComponents;
     }
 
-    public function setChildrenComponents(Collection $children_components): Component
+    public function setChildrenComponents(Collection $childrenComponents): Component
     {
-        $this->children_components = $children_components;
+        $this->childrenComponents = $childrenComponents;
         return $this;
     }
 
     public function addChildComponent(Component $child): Component
     {
-        if (!$this->children_components->contains($child))
-            $this->children_components->add($child);
+        if (!$this->childrenComponents->contains($child))
+            $this->childrenComponents->add($child);
         return $this;
     }
 
     public function removeChildComponent(Component $child): Component
     {
-        $this->children_components->removeElement($child);
+        $this->childrenComponents->removeElement($child);
         return $this;
     }
 

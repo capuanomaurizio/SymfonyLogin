@@ -7,7 +7,6 @@ use App\Document\Process;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 
-
 class ProcessesRepository extends DocumentRepository
 {
     public function getProcessTree(?Process $process): array

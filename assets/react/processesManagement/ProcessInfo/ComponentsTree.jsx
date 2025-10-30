@@ -4,8 +4,8 @@ import {apiRequest} from "../../utils";
 import {DeleteOutlined, DownOutlined, EditOutlined, FileAddOutlined} from "@ant-design/icons";
 
 function findParentComponent(component, childId) {
-    if (!component?.children_components) return null;
-    for (const child of component.children_components) {
+    if (!component?.childrenComponents) return null;
+    for (const child of component.childrenComponents) {
         if (child.id === childId) return component;
         const found = findParentComponent(child, childId);
         if (found) return found;
@@ -15,8 +15,8 @@ function findParentComponent(component, childId) {
 
 function filterRoot(component, idToRemove) {
     if (component.id === idToRemove) return null;
-    if (component.children_components && component.children_components.length > 0) {
-        component.children_components = component.children_components
+    if (component.childrenComponents && component.childrenComponents.length > 0) {
+        component.childrenComponents = component.childrenComponents
             .map(child => filterRoot(child, idToRemove))
             .filter(child => child !== null);
     }
@@ -29,7 +29,7 @@ const ComponentsTree = ({process, setProcess, setComponentToEdit, setOpenEditDra
     async function deleteComponent(root, id) {
         try {
             const parent = findParentComponent(root, id)
-            await apiRequest('deleteComponent', {'parent_id': parent.id, 'id': id});
+            await apiRequest('deleteComponent', {'parentId': parent.id, 'id': id});
             setProcess(prev => ({
                 ...prev,
                 component: filterRoot(prev.component, id)
@@ -42,7 +42,7 @@ const ComponentsTree = ({process, setProcess, setComponentToEdit, setOpenEditDra
     }
 
     const transformComponent = (component) => {
-        const hasChildren = component.children_components?.length > 0;
+        const hasChildren = component.childrenComponents?.length > 0;
         const hasFunctionalities = component.functionalities?.length > 0;
 
         const functionalitiesList = hasFunctionalities ? (
@@ -107,7 +107,7 @@ const ComponentsTree = ({process, setProcess, setComponentToEdit, setOpenEditDra
                 {hasChildren && (
                     <Collapse
                         ghost
-                        items={component.children_components.map(transformComponent)}
+                        items={component.childrenComponents.map(transformComponent)}
                     />
                 )}
             </>
