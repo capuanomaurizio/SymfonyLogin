@@ -12,3 +12,7 @@ body{
     color: rgba(0, 0, 0, 0.88) !important;
     background-color: #fff !important;
 }
+
+.ant-collapse-item .ant-collapse-content {
+    border-top: none;
+}
