@@ -9,8 +9,24 @@ const transformProcesses = (processes) =>
         id: process.id,
     }));
 
+const transformComponents = (components) => {
+    const childIds = new Set(
+        components.flatMap((c) =>
+            (c.childrenComponents || []).map((child) => child.id)
+        )
+    );
+    const roots = components.filter((c) => !childIds.has(c.id));
+    const buildTree = (comp) => ({
+        value: comp.id,
+        title: comp.name,
+        children: (comp.childrenComponents || []).map(buildTree),
+    });
+    return roots.map(buildTree);
+};
+
 export default function UserProcesses() {
 
+    const [components, setComponents] = useState(null);
     const [processes, setProcesses] = useState([]);
     const [hidden, setHidden] = useState(true);
 
@@ -22,7 +38,16 @@ export default function UserProcesses() {
             .catch(console.error);
     }
 
+    const fetchComponents = () => {
+        apiRequest('componentsList')
+            .then(result => {
+                setComponents(transformComponents(JSON.parse(result)));
+            })
+            .catch(console.error);
+    }
+
     useEffect(() => {
+        fetchComponents();
         fetchProcesses();
     }, []);
 
@@ -32,7 +57,7 @@ export default function UserProcesses() {
     return (
         <>
             <ProcessesList processes={processes} setProcesses={setProcesses} setHidden={setHidden}></ProcessesList>
-            <NewProcessForm isHidden={hidden} setHidden={setHidden}></NewProcessForm>
+            <NewProcessForm isHidden={hidden} setHidden={setHidden} components={components}></NewProcessForm>
         </>
     );
 }

@@ -1,10 +1,10 @@
-import {Button, Card, Form, Input, message} from "antd";
+import {Button, Card, Col, DatePicker, Form, Input, message, Row, TreeSelect} from "antd";
 import {CloseOutlined} from "@ant-design/icons";
 import React from "react";
 import {apiRequest} from "../../utils";
 
-function createProcess(nameObj){
-    apiRequest('createProcess', nameObj).then(result => {
+function createProcess(values){
+    apiRequest('createProcess', values).then(result => {
         if (result?.redirect) {
             window.location.href = result.redirect;
         } else {
@@ -13,7 +13,7 @@ function createProcess(nameObj){
     }).catch(console.error);
 }
 
-const newProcessForm = ({isHidden, setHidden}) => {
+const newProcessForm = ({isHidden, setHidden, components}) => {
     return(
         <Card
             title="Crea nuovo processo"
@@ -25,22 +25,66 @@ const newProcessForm = ({isHidden, setHidden}) => {
             }
         >
             <Form
-                labelCol={{ span: 8 }}
-                wrapperCol={{ span: 16 }}
-                style={{ maxWidth: 600 }}
                 autoComplete="off"
-                onFinish={(nameObj) => createProcess(nameObj)}
+                onFinish={(values) => createProcess(values)}
             >
-                <Form.Item
-                    label="Nome processo"
-                    name="name"
-                    rules={[{ required: true, message: "Non lasciare vuoto il campo" }]}
-                >
-                    <Input placeholder='Nome del processo'/>
-                </Form.Item>
+                <Row gutter={16}>
+                    <Col span={12}>
+                        <Form.Item
+                            label="Nome processo"
+                            name="name"
+                            labelCol={{ span: 8 }}
+                            wrapperCol={{ span: 14 }}
+                            rules={[{ required: true, message: "Non lasciare vuoto il campo" }]}
+                        >
+                            <Input placeholder='Nome del processo'/>
+                        </Form.Item>
+                        <Form.Item
+                            label="Descrizione"
+                            name="contextInformation"
+                            labelCol={{ span: 8 }}
+                            wrapperCol={{ span: 14 }}
+                            rules={[{ required: true, message: "Non lasciare vuoto il campo" }]}
+                        >
+                            <Input.TextArea placeholder="Descrizione del processo" />
+                        </Form.Item>
+                        <Form.Item
+                            label="Prospetto termine"
+                            name="expirationDate"
+                            labelCol={{ span: 8 }}
+                            wrapperCol={{ span: 14 }}
+                            rules={[{ required: true, message: "Non lasciare vuoto il campo" }]}
+                        >
+                            <DatePicker></DatePicker>
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <Form.Item
+                            label="Componente radice"
+                            name="rootId"
+                            labelCol={{ span: 8 }}
+                            wrapperCol={{ span: 14 }}
+                        >
+                            <TreeSelect
+                                showSearch
+                                filterTreeNode={(input, treeNode) =>
+                                    treeNode.title.toLowerCase().includes(input.toLowerCase())
+                                }
+                                style={{ width: '100%' }}
+                                styles={{
+                                    popup: { root: { maxHeight: 400, overflow: 'auto' } },
+                                }}
+                                placeholder="Seleziona il componente radice"
+                                allowClear
+                                treeDefaultExpandAll
+                                treeData={components}
+                            />
+                        </Form.Item>
+                    </Col>
+                </Row>
                 <Form.Item label={null}>
-                    <Button type="default" htmlType="submit">
-                        Salva
+                    <Button block variant="outlined" color="green" htmlType="submit">
+                        Crea processo
                     </Button>
                 </Form.Item>
             </Form>

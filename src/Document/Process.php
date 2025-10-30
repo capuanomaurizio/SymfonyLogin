@@ -17,9 +17,26 @@ class Process
     #[Groups(['process:read'])]
     private string $name;
 
+    #[ODM\Field(type: 'string')]
+    #[Groups(['process:read'])]
+    private string $contextInformation;
+
+    #[ODM\Field(type: 'date')]
+    #[Groups(['process:read'])]
+    private ?\DateTime $creationDate;
+
+    #[ODM\Field(type: 'date')]
+    #[Groups(['process:read'])]
+    private ?\DateTime $expirationDate = null;
+
     #[ODM\ReferenceOne(storeAs: 'dbRef', targetDocument: Component::class)]
     #[Groups(['process:read'])]
     private ?Component $component = null;
+
+    public function __construct()
+    {
+        $this->creationDate = new \DateTime();
+    }
 
     public function getId(): ?string
     {
@@ -42,6 +59,34 @@ class Process
         $this->name = $name;
         return $this;
     }
+
+    public function getContextInformation(): string
+    {
+        return $this->contextInformation;
+    }
+
+    public function setContextInformation(string $contextInformation): Process
+    {
+        $this->contextInformation = $contextInformation;
+        return $this;
+    }
+
+    public function getCreationDate(): ?\DateTime
+    {
+        return $this->creationDate;
+    }
+
+    public function getExpirationDate(): ?\DateTime
+    {
+        return $this->expirationDate;
+    }
+
+    public function setExpirationDate(?\DateTime $expirationDate): Process
+    {
+        $this->expirationDate = $expirationDate;
+        return $this;
+    }
+
 
     public function getComponent(): ?Component
     {
