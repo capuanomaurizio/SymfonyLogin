@@ -27,7 +27,7 @@ const ProcessDetails = ({ process, setProcess }) => {
                   <Switch
                       checkedChildren={<EditOutlined />}
                       unCheckedChildren={<EditOutlined />}
-                      defaultChecked={false}
+                      checked={enabledForm}
                       onChange={() => setEnabledForm(!enabledForm)}
                   />
               }>
@@ -54,7 +54,7 @@ const ProcessDetails = ({ process, setProcess }) => {
                             <Input />
                         </Form.Item>
                         <Form.Item
-                            label="Descrizione"
+                            label="Informazioni di contesto"
                             name="contextInformation"
                             labelCol={{ span: 8 }}
                             wrapperCol={{ span: 14 }}

@@ -40,7 +40,7 @@ const newProcessForm = ({isHidden, setHidden, components}) => {
                             <Input placeholder='Nome del processo'/>
                         </Form.Item>
                         <Form.Item
-                            label="Descrizione"
+                            label="Informazioni di contesto"
                             name="contextInformation"
                             labelCol={{ span: 8 }}
                             wrapperCol={{ span: 14 }}
