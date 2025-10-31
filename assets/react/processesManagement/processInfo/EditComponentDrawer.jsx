@@ -18,6 +18,13 @@ function updateRoot(component, idToUpdate, updatedFields) {
 const EditComponentDrawer = ({componentToEdit, setComponentToEdit, functionToEdit, setFunctionToEdit, openEditDrawer, setOpenEditDrawer, functionToDelete,
                              openNewFunctionDrawer, setOpenNewFunctionDrawer, openEditFunctionDrawer, setOpenEditFunctionDrawer, setProcess}) => {
 
+    const [form] = Form.useForm();
+
+    const handleClose = () => {
+        setOpenEditDrawer(false);
+        form.resetFields();
+    }
+
     async function editComponent(values) {
         try{
             await apiRequest('editComponent', {'id': componentToEdit.id, 'newName': values.name});
@@ -62,24 +69,26 @@ const EditComponentDrawer = ({componentToEdit, setComponentToEdit, functionToEdi
         <Drawer
             title={"Modifica componente "+componentToEdit?.name}
             width={920}
-            onClose={() => {setOpenEditDrawer(false)}}
+            onClose={handleClose}
             open={openEditDrawer}
             extra={
                 <Space>
-                    <Button onClick={() => setOpenEditDrawer(false)}>Cancel</Button>
+                    <Button onClick={handleClose}>Cancel</Button>
                     <Button htmlType="submit" form="editComponentForm" type="primary">
                         Submit
                     </Button>
                 </Space>
             }
         >
-            <Form layout="vertical" requiredMark={false}
-                  id="editComponentForm"
-                  onFinish={(values) => {
-                      editComponent(values);
-                      setOpenEditDrawer(false);
-                  }}>
-
+            <Form
+                form={form}
+                layout="vertical" requiredMark={false}
+                id="editComponentForm"
+                onFinish={(values) => {
+                    editComponent(values);
+                    handleClose();
+                }}
+            >
                 <Row gutter={16}>
                     <Col span={12}>
                         <Form.Item

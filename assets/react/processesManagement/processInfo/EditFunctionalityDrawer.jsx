@@ -1,18 +1,26 @@
-import {Button, Col, Drawer, Form, Input, message, Row, Space} from "antd";
+import {Button, Col, Drawer, Form, Input, message, Row, Select, Space} from "antd";
 import React from "react";
 import {apiRequest} from "../../utils";
+import {PlusOutlined} from "@ant-design/icons";
 
 const EditFunctionalityDrawer = ({functionToEdit, openEditFunctionDrawer, setOpenEditFunctionDrawer,
                                  componentToEdit, setComponentToEdit, setProcess, updateRoot}) => {
 
+    const [form] = Form.useForm();
+
+    const handleClose = () => {
+        setOpenEditFunctionDrawer(false);
+        form.resetFields();
+    }
+
     async function editFunction(values) {
         try {
-            await apiRequest('editFunction', {'id': functionToEdit.id, 'newName': values.name});
+            const editedFunction = await apiRequest('editFunction', {'functionId': functionToEdit.id, 'values': values});
             setComponentToEdit(prev => {
                 const updatedComponent = {
                     ...prev,
                     functionalities: prev.functionalities.map(f =>
-                        f.id === functionToEdit.id ? {...f, name: values.name} : f
+                        f.id === functionToEdit.id ? editedFunction : f
                     ),
                 };
                 setProcess(prev => ({
@@ -33,29 +41,31 @@ const EditFunctionalityDrawer = ({functionToEdit, openEditFunctionDrawer, setOpe
             title={"Modifica funzione "+functionToEdit?.name}
             width={620}
             closable={false}
-            onClose={() => setOpenEditFunctionDrawer(false)}
+            onClose={handleClose}
             open={openEditFunctionDrawer}
             extra={
                 <Space>
-                    <Button onClick={() => setOpenEditFunctionDrawer(false)}>Cancel</Button>
+                    <Button onClick={handleClose}>Cancel</Button>
                     <Button htmlType="submit" form="editFunctionForm" type="primary">
                         Submit
                     </Button>
                 </Space>
             }
         >
-            <Form layout="vertical" requiredMark={false}
-                  id="editFunctionForm"
-                  onFinish={(values) => {
-                      editFunction(values);
-                      setOpenEditFunctionDrawer(false);
-                  }}>
+            <Form
+                form={form}
+                layout="vertical" requiredMark={false}
+                id="editFunctionForm"
+                onFinish={(values) => {
+                    editFunction(values);
+                    handleClose()
+                }}
+            >
                 <Row gutter={16}>
-                    <Col span={12}>
+                    <Col span={18}>
                         <Form.Item
                             name="name"
                             label="Nome"
-                            rules={[{ required: true, message: 'Non lasciare il campo vuoto' }]}
                         >
                             <Input placeholder="Nuovo nome della funzione" />
                         </Form.Item>

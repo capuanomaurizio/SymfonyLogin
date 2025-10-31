@@ -14,6 +14,13 @@ function updateRoot(component, parentId, newComponent) {
 
 const CreateComponentDrawer = ({parentOfComponentToCreate, openCreateDrawer, setOpenCreateDrawer, setProcess}) => {
 
+    const [form] = Form.useForm();
+
+    const handleClose = () => {
+        setOpenCreateDrawer(false);
+        form.resetFields();
+    }
+
     async function createComponent(values) {
         const newComponent = await apiRequest('createComponent', {'parentId': parentOfComponentToCreate.id, 'name': values.name});
         setProcess(prev => ({
@@ -27,23 +34,26 @@ const CreateComponentDrawer = ({parentOfComponentToCreate, openCreateDrawer, set
         <Drawer
             title={"Crea nuovo componente figlio di "+parentOfComponentToCreate?.name}
             width={920}
-            onClose={() => setOpenCreateDrawer(false)}
+            onClose={handleClose}
             open={openCreateDrawer}
             extra={
                 <Space>
-                    <Button onClick={() => setOpenCreateDrawer(false)}>Cancel</Button>
+                    <Button onClick={handleClose}>Cancel</Button>
                     <Button htmlType="submit" form="createComponentForm" type="primary">
                         Submit
                     </Button>
                 </Space>
             }
         >
-            <Form layout="vertical" requiredMark={false}
-                  id="createComponentForm"
-                  onFinish={(values) => {
-                      createComponent(values);
-                      setOpenCreateDrawer(false);
-                  }}>
+            <Form
+                form={form}
+                layout="vertical" requiredMark={false}
+                id="createComponentForm"
+                onFinish={(values) => {
+                    createComponent(values);
+                    handleClose();
+                }}
+            >
                 <Row gutter={16}>
                     <Col span={12}>
                         <Form.Item

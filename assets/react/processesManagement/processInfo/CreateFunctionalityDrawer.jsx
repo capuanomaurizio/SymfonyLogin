@@ -6,13 +6,16 @@ import {apiRequest} from "../../utils";
 const CreateFunctionalityDrawer = ({openNewFunctionDrawer, setOpenNewFunctionDrawer,
                                    componentToEdit, setComponentToEdit, setProcess, updateRoot}) => {
 
+    const [form] = Form.useForm();
+
+    const handleClose = () => {
+        setOpenNewFunctionDrawer(false);
+        form.resetFields();
+    }
+
     async function createFunction(values) {
         try {
-            setOpenNewFunctionDrawer(false);
-            const newFunction = await apiRequest('createFunction', {
-                'componentId': componentToEdit.id,
-                'values': values
-            });
+            const newFunction = await apiRequest('createFunction', {'componentId': componentToEdit.id, 'values': values});
             setComponentToEdit(prev => {
                 const updatedComponent = {
                     ...prev,
@@ -36,23 +39,26 @@ const CreateFunctionalityDrawer = ({openNewFunctionDrawer, setOpenNewFunctionDra
             title={"Nuova funzione di "+componentToEdit?.name}
             width={620}
             closable={false}
-            onClose={() => setOpenNewFunctionDrawer(false)}
+            onClose={handleClose}
             open={openNewFunctionDrawer}
             extra={
                 <Space>
-                    <Button onClick={() => setOpenNewFunctionDrawer(false)}>Cancel</Button>
+                    <Button onClick={handleClose}>Cancel</Button>
                     <Button htmlType="submit" form="newFunctionForm" type="primary">
                         Submit
                     </Button>
                 </Space>
             }
         >
-            <Form layout="vertical" requiredMark={false}
-                  id="newFunctionForm"
-                  onFinish={(values) => {
-                      createFunction(values);
-                      setOpenNewFunctionDrawer(false);
-                  }}>
+            <Form
+                form={form}
+                layout="vertical" requiredMark={false}
+                id="newFunctionForm"
+                onFinish={(values) => {
+                    createFunction(values);
+                    handleClose();
+                }}
+            >
                 <Row gutter={16}>
                     <Col span={18}>
                         <Form.Item
