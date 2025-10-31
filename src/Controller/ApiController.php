@@ -198,12 +198,20 @@ class ApiController extends AbstractController
     #[Route('/api/editFunction', methods: ['POST'])]
     public function editFunction(Request $request): Response
     {
-        $data = $request->getPayload();
-        $function = $this->documentManager->getRepository(Functionality::class)->findOneBy(['id' => $data->get('id')]);
-        $function->setName($data->get('newName'));
+        $data = json_decode($request->getContent(), true);
+        $function = $this->documentManager->getRepository(Functionality::class)->findOneBy(['id' => $data['functionId']]);
+        if(!empty($data['values']['name']))
+            $function->setName($data['values']['name']);
+        if(isset($data['values']['requirements']))
+            foreach ($data['values']['requirements'] as $requirement) {
+                $function->addRequirement((new FunctionalityRequirement())
+                    ->setContent($requirement['content'])
+                    ->setRequirementType($requirement['type'] == 'Functional' ?
+                        FunctionalityRequirementType::FUNCTIONAL : FunctionalityRequirementType::CONTROL_FACTOR));
+            }
         $this->documentManager->persist($function);
         $this->documentManager->flush();
-        return $this->json([]);
+        return $this->json($function);
     }
 
     #[Route('/api/deleteFunction', methods: ['POST'])]
