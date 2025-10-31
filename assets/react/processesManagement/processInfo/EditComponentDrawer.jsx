@@ -103,25 +103,36 @@ const EditComponentDrawer = ({componentToEdit, setComponentToEdit, functionToEdi
                     </div>
                 }
                 bordered
-                itemLayout="horizontal"
+                itemLayout="horizontals"
                 dataSource={componentToEdit?.functionalities || []}
-                renderItem={(item) => (
-                    <List.Item>
+                renderItem={(functionality) => (
+                    <List.Item key={functionality.id} style={{ flexDirection: 'column', alignItems: 'stretch' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                         <List.Item.Meta
-                            key={item.id}
-                            title={item.name}
+                            title={functionality.name}
                         />
                         <Space size={"middle"}>
                             <Button variant="outlined" onClick={() => {
-                                setFunctionToEdit(componentToEdit?.functionalities.find(obj => obj.id === item.id));
+                                setFunctionToEdit(componentToEdit?.functionalities.find(obj => obj.id === functionality.id));
                                 setOpenEditFunctionDrawer(true)
                             }}>
                                 <EditOutlined />
                             </Button>
-                            <Button variant="outlined" color="danger" onClick={ () => deleteFunction(item.id) }>
+                            <Button variant="outlined" color="danger" onClick={ () => deleteFunction(functionality.id) }>
                                 <DeleteOutlined />
                             </Button>
                         </Space>
+                        </div>
+                        {functionality.requirements?.length > 0 && (
+                            <>
+                            <strong>Requisiti della funzione: </strong>
+                            <ul style={{ listStyleType: 'none' }}>
+                                {functionality.requirements.map((req) => (
+                                    <li key={req.id}><strong>{req.requirementType}</strong> {req.content}</li>
+                                ))}
+                            </ul>
+                            </>
+                        )}
                     </List.Item>
                 )}
             />
