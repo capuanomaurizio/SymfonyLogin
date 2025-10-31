@@ -27,12 +27,12 @@ abstract class Requirement
         return $this;
     }
 
-    public function getName(): string
+    public function getContent(): string
     {
         return $this->content;
     }
 
-    public function setName(string $content): self
+    public function setContent(string $content): self
     {
         $this->content = $content;
         return $this;
