@@ -1,7 +1,9 @@
 import {Button, Col, Drawer, Form, Input, List, Row, Space, message} from "antd";
 import {DeleteOutlined, EditOutlined, FileAddOutlined} from "@ant-design/icons";
 import {apiRequest} from "../../utils";
-import {useEffect} from "react";
+import React, {useEffect} from "react";
+import EditFunctionalityDrawer from "./EditFunctionalityDrawer";
+import CreateFunctionalityDrawer from "./CreateFunctionalityDrawer";
 
 function updateRoot(component, idToUpdate, updatedFields) {
     if (component.id === idToUpdate) return { ...component, ...updatedFields };
@@ -30,54 +32,6 @@ const EditComponentDrawer = ({componentToEdit, setComponentToEdit, functionToEdi
         }
     }
 
-    async function createFunction(values) {
-        try {
-            setOpenNewFunctionDrawer(false);
-            const newFunction = await apiRequest('createFunction', {
-                'componentId': componentToEdit.id,
-                'name': values.name
-            });
-            setComponentToEdit(prev => {
-                const updatedComponent = {
-                    ...prev,
-                    functionalities: [...prev.functionalities, newFunction]
-                };
-                setProcess(prev => ({
-                    ...prev,
-                    component: updateRoot(prev.component, componentToEdit.id, updatedComponent)
-                }));
-                return updatedComponent;
-            });
-            message.success("Funzionalità aggiunta al componente!");
-        }
-        catch (e) {
-            message.error("Funzionalità non aggiunta al componente")
-        }
-    }
-
-    async function editFunction(values) {
-        try {
-            await apiRequest('editFunction', {'id': functionToEdit.id, 'newName': values.name});
-            setComponentToEdit(prev => {
-                const updatedComponent = {
-                    ...prev,
-                    functionalities: prev.functionalities.map(f =>
-                        f.id === functionToEdit.id ? {...f, name: values.name} : f
-                    ),
-                };
-                setProcess(prev => ({
-                    ...prev,
-                    component: updateRoot(prev.component, componentToEdit.id, updatedComponent)
-                }));
-                return updatedComponent;
-            });
-            message.success("Funzionalità del componente modificata!");
-        }
-        catch (e) {
-            message.error("Funzionalità del componente non modificata")
-        }
-    }
-
     async function deleteFunction(id) {
         try {
             await apiRequest('deleteFunction', {'componentId': componentToEdit.id, 'functionId': id});
@@ -95,7 +49,7 @@ const EditComponentDrawer = ({componentToEdit, setComponentToEdit, functionToEdi
             message.success("Funzione rimossa dal componente!");
         }
         catch (e) {
-            message.error("Funzionalità non rimossa dal componente")
+            message.error("Funzionalità non rimossa dal componente");
         }
     }
 
@@ -171,74 +125,23 @@ const EditComponentDrawer = ({componentToEdit, setComponentToEdit, functionToEdi
                     </List.Item>
                 )}
             />
-            <Drawer
-                title={"Modifica funzione "+functionToEdit?.name}
-                width={620}
-                closable={false}
-                onClose={() => setOpenEditFunctionDrawer(false)}
-                open={openEditFunctionDrawer}
-                extra={
-                    <Space>
-                        <Button onClick={() => setOpenEditFunctionDrawer(false)}>Cancel</Button>
-                        <Button htmlType="submit" form="editFunctionForm" type="primary">
-                            Submit
-                        </Button>
-                    </Space>
-                }
-            >
-                <Form layout="vertical" requiredMark={false}
-                      id="editFunctionForm"
-                      onFinish={(values) => {
-                          editFunction(values);
-                          setOpenEditFunctionDrawer(false);
-                      }}>
-                    <Row gutter={16}>
-                        <Col span={12}>
-                            <Form.Item
-                                name="name"
-                                label="Nome"
-                                rules={[{ required: true, message: 'Non lasciare il campo vuoto' }]}
-                            >
-                                <Input placeholder="Nuovo nome della funzione" />
-                            </Form.Item>
-                        </Col>
-                    </Row>
-                </Form>
-            </Drawer>
-            <Drawer
-                title={"Nuova funzione di "+componentToEdit?.name}
-                width={620}
-                closable={false}
-                onClose={() => setOpenNewFunctionDrawer(false)}
-                open={openNewFunctionDrawer}
-                extra={
-                    <Space>
-                        <Button onClick={() => setOpenNewFunctionDrawer(false)}>Cancel</Button>
-                        <Button htmlType="submit" form="newFunctionForm" type="primary">
-                            Submit
-                        </Button>
-                    </Space>
-                }
-            >
-                <Form layout="vertical" requiredMark={false}
-                      id="newFunctionForm"
-                      onFinish={(values) => {
-                          createFunction(values);
-                          setOpenEditFunctionDrawer(false);
-                      }}>
-                    <Row gutter={16}>
-                        <Col span={12}>
-                            <Form.Item
-                                name="name"
-                                label="Nome"
-                                rules={[{ required: true, message: 'Non lasciare il campo vuoto' }]}
-                            >
-                                <Input placeholder="Nome della funzione" />
-                            </Form.Item>
-                        </Col>
-                    </Row>
-                </Form>
-            </Drawer>
+            <EditFunctionalityDrawer
+                functionToEdit={functionToEdit}
+                openEditFunctionDrawer={openEditFunctionDrawer}
+                setOpenEditFunctionDrawer={setOpenEditFunctionDrawer}
+                componentToEdit={componentToEdit}
+                setComponentToEdit={setComponentToEdit}
+                setProcess={setProcess}
+                updateRoot={updateRoot}
+            ></EditFunctionalityDrawer>
+            <CreateFunctionalityDrawer
+                openNewFunctionDrawer={openNewFunctionDrawer}
+                setOpenNewFunctionDrawer={setOpenNewFunctionDrawer}
+                componentToEdit={componentToEdit}
+                setComponentToEdit={setComponentToEdit}
+                setProcess={setProcess}
+                updateRoot={updateRoot}
+            ></CreateFunctionalityDrawer>
         </Drawer>
     )
 }
