@@ -8,6 +8,10 @@ use App\Document\Component;
 use App\Document\Functionality;
 use App\Document\Process;
 use App\Document\User;
+use App\Document\RootRequirement;
+use App\Document\FunctionalityRequirement;
+use App\Enum\FunctionalityRequirementType;
+use App\Enum\RootRequirementType;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\MongoDBException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -88,12 +92,18 @@ class ApiController extends AbstractController
     #[Route('/api/createProcess', methods: ['POST'])]
     public function createProcess(Request $request): Response
     {
-        $data = $request->getPayload();
-        $rootComponent = $this->documentManager->getRepository(Component::class)->findOneBy(['id' => $data->get('rootId')]);
-        $process = (new Process())->setName($data->get('name'))
-            ->setContextInformation($data->get('contextInformation'))
-            ->setExpirationDate(new \DateTime($data->get('expirationDate')))
+        $data = json_decode($request->getContent(), true);
+        $rootComponent = $this->documentManager->getRepository(Component::class)->findOneBy(['id' => $data['rootId']]);
+        $process = (new Process())->setName($data['name'])
+            ->setContextInformation($data['contextInformation'])
+            ->setExpirationDate(new \DateTime($data['expirationDate']))
             ->setComponent($rootComponent);
+        if(isset($data['requirements']))
+            foreach ($data['requirements'] as $requirement) {
+                $process->addRequirement((new RootRequirement())
+                    ->setContent($requirement['content'])
+                    ->setRequirementType($requirement['type'] == 'NonFunctional' ? RootRequirementType::NON_FUNCTIONAL : RootRequirementType::UNINTENDED_OUTPUT));
+            }
         $this->documentManager->persist($process);
         $this->documentManager->flush();
         return $this->json([
@@ -114,7 +124,6 @@ class ApiController extends AbstractController
         $process->setName($values['name'])
             ->setContextInformation($values['contextInformation'])
             ->setExpirationDate(new \DateTime($values['expirationDate']));
-        //dd($this->json($process));
         $this->documentManager->persist($process);
         $this->documentManager->flush();
         return $this->json($process);

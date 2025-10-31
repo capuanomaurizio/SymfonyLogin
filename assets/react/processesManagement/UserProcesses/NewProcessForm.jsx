@@ -1,7 +1,8 @@
-import {Button, Card, Col, DatePicker, Form, Input, message, Row, TreeSelect} from "antd";
-import {CloseOutlined} from "@ant-design/icons";
+import {Button, Card, Col, DatePicker, Form, Input, message, Row, Select, Space, TreeSelect} from "antd";
+import {CloseOutlined, MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
 import React from "react";
 import {apiRequest} from "../../utils";
+import '../../../styles/NewProcessForm.css'
 
 function createProcess(values){
     apiRequest('createProcess', values).then(result => {
@@ -25,7 +26,7 @@ const newProcessForm = ({isHidden, setHidden, components}) => {
             }
         >
             <Form
-                autoComplete="off"
+                labelWrap
                 onFinish={(values) => createProcess(values)}
             >
                 <Row gutter={16}>
@@ -64,6 +65,7 @@ const newProcessForm = ({isHidden, setHidden, components}) => {
                             name="rootId"
                             labelCol={{ span: 8 }}
                             wrapperCol={{ span: 14 }}
+                            rules={[{ required: true, message: "Seleziona componente radice del processo" }]}
                         >
                             <TreeSelect
                                 showSearch
@@ -79,6 +81,70 @@ const newProcessForm = ({isHidden, setHidden, components}) => {
                                 treeDefaultExpandAll
                                 treeData={components}
                             />
+                        </Form.Item>
+                        <Form.Item
+                            label="Requisiti"
+                            labelCol={{ span: 8 }}
+                            wrapperCol={{ span: 14 }}
+                            required={false}
+                        >
+                            <Form.List name="requirements">
+                                {(fields, { add, remove }) => (
+                                    <>
+                                        {fields.map(({ key, name}) => (
+                                            <Form.Item required={false} key={key}>
+                                                <Form.Item
+                                                    name={[name, 'content']}
+                                                    validateTrigger={['onChange', 'onBlur']}
+                                                    rules={[
+                                                        {
+                                                            required: true,
+                                                            whitespace: true,
+                                                            message: "Inserisci le informazioni del requisito o eliminalo",
+                                                        },
+                                                    ]}
+                                                    noStyle
+                                                >
+                                                        <Input
+                                                            placeholder="Contenuto del requisito"
+                                                            style={{ width: '50%' }}
+                                                        />
+                                                </Form.Item>
+                                                <Form.Item
+                                                    name={[name, 'type']}
+                                                    rules={[
+                                                        { required: true, message: 'Seleziona una tipologia' },
+                                                    ]}
+                                                    noStyle
+                                                >
+                                                    <Select
+                                                        placeholder="Tipologia di requisito"
+                                                        style={{ width: '35%', marginLeft: 5 }}
+                                                        options={[
+                                                            { value: 'UnintendedOutput', label: 'Unintended output' },
+                                                            { value: 'NonFunctional', label: 'Non functional' },
+                                                        ]}
+                                                    />
+                                                </Form.Item>
+                                                <MinusCircleOutlined
+                                                    className="dynamic-delete-button"
+                                                    onClick={() => remove(name)}
+                                                />
+                                            </Form.Item>
+                                        ))}
+                                        <Form.Item>
+                                            <Button
+                                                type="dashed"
+                                                onClick={() => add()}
+                                                style={{ width: '100%' }}
+                                                icon={<PlusOutlined />}
+                                            >
+                                                Aggiungi requisito
+                                            </Button>
+                                        </Form.Item>
+                                    </>
+                                )}
+                            </Form.List>
                         </Form.Item>
                     </Col>
                 </Row>
