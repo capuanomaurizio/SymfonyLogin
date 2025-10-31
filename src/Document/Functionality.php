@@ -2,6 +2,8 @@
 
 namespace App\Document;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -15,6 +17,15 @@ class Functionality
     #[ODM\Field(type: 'string')]
     #[Groups(['process:read'])]
     private string $name;
+
+    #[ODM\ReferenceMany(storeAs: 'dbRef', targetDocument: RootRequirement::class, cascade: ['persist', 'remove'])]
+    #[Groups(['process:read'])]
+    private Collection $requirements;
+
+    public function __construct()
+    {
+        $this->requirements = new ArrayCollection();
+    }
 
     public function getId(): ?string
     {
@@ -37,5 +48,20 @@ class Functionality
         $this->name = $name;
         return $this;
     }
+
+    public function getRequirements(): Collection
+    {
+        return $this->requirements;
+    }
+
+    public function addRequirement(FunctionalityRequirement $requirement): Functionality
+    {
+        if(!$this->requirements->contains($requirement)){
+            $this->requirements->add($requirement);
+        }
+        return $this;
+    }
+
+
 
 }

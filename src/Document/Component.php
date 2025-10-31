@@ -58,12 +58,6 @@ class Component
         return $this->childrenComponents;
     }
 
-    public function setChildrenComponents(Collection $childrenComponents): Component
-    {
-        $this->childrenComponents = $childrenComponents;
-        return $this;
-    }
-
     public function addChildComponent(Component $child): Component
     {
         if (!$this->childrenComponents->contains($child))
@@ -80,12 +74,6 @@ class Component
     public function getFunctionalities(): Collection
     {
         return $this->functionalities;
-    }
-
-    public function setFunctionalities(Collection $functionalities): Component
-    {
-        $this->functionalities = $functionalities;
-        return $this;
     }
 
     public function addFunctionality(Functionality $functionality): Component

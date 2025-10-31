@@ -3,6 +3,8 @@
 namespace App\Document;
 
 use App\Repository\ProcessesRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -33,9 +35,14 @@ class Process
     #[Groups(['process:read'])]
     private ?Component $component = null;
 
+    #[ODM\ReferenceMany(storeAs: 'dbRef', targetDocument: RootRequirement::class, cascade: ['persist', 'remove'])]
+    #[Groups(['process:read'])]
+    private Collection $requirements;
+
     public function __construct()
     {
         $this->creationDate = new \DateTime();
+        $this->requirements = new ArrayCollection();
     }
 
     public function getId(): ?string
@@ -99,7 +106,17 @@ class Process
         return $this;
     }
 
+    public function getRequirements(): Collection
+    {
+        return $this->requirements;
+    }
 
-
+    public function addRequirement(RootRequirement $requirement): Process
+    {
+        if(!$this->requirements->contains($requirement)){
+            $this->requirements->add($requirement);
+        }
+        return $this;
+    }
 
 }
