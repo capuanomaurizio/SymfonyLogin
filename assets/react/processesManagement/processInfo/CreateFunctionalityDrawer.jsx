@@ -19,7 +19,7 @@ const CreateFunctionalityDrawer = ({openNewFunctionDrawer, setOpenNewFunctionDra
             setComponentToEdit(prev => {
                 const updatedComponent = {
                     ...prev,
-                    functionalities: [...prev.functionalities, newFunction]
+                    functionalities: [...(prev.functionalities || []), newFunction]
                 };
                 setProcess(prev => ({
                     ...prev,
