@@ -1,8 +1,8 @@
 import {apiRequest} from "../../utils";
-import moment from "moment";
 import {Button, Card, Col, DatePicker, Form, Input, message, Row, Switch} from "antd";
 import React, {useState} from "react";
 import {EditOutlined} from "@ant-design/icons";
+import dayjs from "dayjs";
 
 const ProcessDetails = ({ process, setProcess }) => {
 
@@ -38,7 +38,7 @@ const ProcessDetails = ({ process, setProcess }) => {
                 initialValues={{
                     name: process.name,
                     contextInformation: process.contextInformation,
-                    expirationDate: moment(process.expirationDate)
+                    expirationDate: dayjs(process.expirationDate)
                 }}
                 onFinish={(values) => {editProcess(values); setEnabledForm(false)}}
             >
