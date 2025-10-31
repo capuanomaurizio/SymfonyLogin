@@ -1,11 +1,11 @@
 import {message} from "antd";
 import React, {useEffect, useState} from 'react';
 import {apiRequest} from "../utils";
-import StepsNavigator from "../processesManagement/ProcessInfo/StepsNavigator";
-import ProcessDetails from "../processesManagement/ProcessInfo/ProcessDetails"
-import ComponentsTree from "../processesManagement/ProcessInfo/ComponentsTree";
-import EditComponentDrawer from "../processesManagement/ProcessInfo/EditComponentDrawer";
-import CreateComponentDrawer from "../processesManagement/ProcessInfo/CreateComponentDrawer";
+import StepsNavigator from "../processesManagement/processInfo/StepsNavigator";
+import ProcessDetails from "../processesManagement/processInfo/ProcessDetails"
+import ComponentsTree from "../processesManagement/processInfo/ComponentsTree";
+import EditComponentDrawer from "../processesManagement/processInfo/EditComponentDrawer";
+import CreateComponentDrawer from "../processesManagement/processInfo/CreateComponentDrawer";
 
 export default function ProcessInfo({ processId }) {
 
