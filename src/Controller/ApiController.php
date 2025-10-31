@@ -226,18 +226,5 @@ class ApiController extends AbstractController
         return $this->json([]);
     }
 
-    #[Route('/api/prove')]
-    public function prove(Request $request): Response
-    {
-        $process = $this->documentManager->getRepository(Process::class)->findOneBy(['name' => 'ProcessoPrincipale']);
-        $process->addRequirement((new RootRequirement())->setContent('requisito principale')->setRequirementType(RootRequirementType::NON_FUNCTIONAL));
-        $function = $this->documentManager->getRepository(Functionality::class)->findOneBy(['name' => 'funzione1']);
-        $function->addRequirement((new FunctionalityRequirement())->setContent('requisito della funzione')->setRequirementType(FunctionalityRequirementType::FUNCTIONAL));
-        $this->documentManager->persist($process);
-        $this->documentManager->persist($function);
-        $this->documentManager->flush();
-        return $this->json([]);
-    }
-
 }
 
