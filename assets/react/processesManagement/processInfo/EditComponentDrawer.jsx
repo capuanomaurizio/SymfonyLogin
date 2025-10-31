@@ -134,7 +134,7 @@ const EditComponentDrawer = ({componentToEdit, setComponentToEdit, functionToEdi
                         </div>
                         {functionality.requirements?.length > 0 && (
                             <>
-                            <strong>Requisiti della funzione: </strong>
+                            <em>Requisiti della funzione: </em>
                             <ul style={{ listStyleType: 'none' }}>
                                 {functionality.requirements.map((req) => (
                                     <li key={req.id}><strong>{req.requirementType}</strong> {req.content}</li>
