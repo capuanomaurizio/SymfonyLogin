@@ -171,6 +171,7 @@ class ApiController extends AbstractController
         $child = $this->documentManager->getRepository(Component::class)->findOneBy(['id' => $data->get('id')]);
         $parent->removeChildComponent($child);
         $this->documentManager->persist($parent);
+        $this->documentManager->remove($child);
         $this->documentManager->flush();
         return $this->json([]);
     }
@@ -222,6 +223,7 @@ class ApiController extends AbstractController
         $function = $this->documentManager->getRepository(Functionality::class)->findOneBy(['id' => $data->get('functionId')]);
         $component->removeFunctionality($function);
         $this->documentManager->persist($component);
+        $this->documentManager->remove($function);
         $this->documentManager->flush();
         return $this->json([]);
     }
