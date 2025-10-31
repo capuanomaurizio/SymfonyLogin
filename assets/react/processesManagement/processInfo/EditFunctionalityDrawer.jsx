@@ -59,6 +59,64 @@ const EditFunctionalityDrawer = ({functionToEdit, openEditFunctionDrawer, setOpe
                         >
                             <Input placeholder="Nuovo nome della funzione" />
                         </Form.Item>
+                        <Form.Item
+                            label="Requisiti"
+                            required={false}
+                        >
+                            <Form.List name="requirements">
+                                {(fields, { add }) => (
+                                    <>
+                                        {fields.map(({ key, name}) => (
+                                            <Form.Item required={false} key={key}>
+                                                <Form.Item
+                                                    name={[name, 'content']}
+                                                    validateTrigger={['onChange', 'onBlur']}
+                                                    rules={[
+                                                        {
+                                                            required: true,
+                                                            whitespace: true,
+                                                            message: "Inserisci le informazioni del requisito",
+                                                        },
+                                                    ]}
+                                                    noStyle
+                                                >
+                                                    <Input
+                                                        placeholder="Contenuto del requisito"
+                                                        style={{ width: '55%' }}
+                                                    />
+                                                </Form.Item>
+                                                <Form.Item
+                                                    name={[name, 'type']}
+                                                    rules={[
+                                                        { required: true, message: 'Seleziona una tipologia' },
+                                                    ]}
+                                                    noStyle
+                                                >
+                                                    <Select
+                                                        placeholder="Tipologia di requisito"
+                                                        style={{ width: '40%', marginLeft: 5 }}
+                                                        options={[
+                                                            { value: 'ControlFactor', label: 'Control factor' },
+                                                            { value: 'Functional', label: 'Functional' },
+                                                        ]}
+                                                    />
+                                                </Form.Item>
+                                            </Form.Item>
+                                        ))}
+                                        <Form.Item>
+                                            <Button
+                                                type="dashed"
+                                                onClick={() => add()}
+                                                style={{ width: '100%' }}
+                                                icon={<PlusOutlined />}
+                                            >
+                                                Aggiungi requisito
+                                            </Button>
+                                        </Form.Item>
+                                    </>
+                                )}
+                            </Form.List>
+                        </Form.Item>
                     </Col>
                 </Row>
             </Form>
