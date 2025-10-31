@@ -27,7 +27,7 @@ const transformComponents = (components) => {
 export default function UserProcesses() {
 
     const [components, setComponents] = useState(null);
-    const [processes, setProcesses] = useState([]);
+    const [processes, setProcesses] = useState(null);
     const [hidden, setHidden] = useState(true);
 
     const fetchProcesses = () => {
@@ -51,7 +51,7 @@ export default function UserProcesses() {
         fetchProcesses();
     }, []);
 
-    if (!processes || processes.length === 0)
+    if (!processes)
         return <p>Caricamento dei processi dell'utente...</p>;
 
     return (

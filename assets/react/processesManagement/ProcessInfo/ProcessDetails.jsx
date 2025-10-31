@@ -34,7 +34,7 @@ const ProcessDetails = ({ process, setProcess }) => {
             <Form
                 form={form}
                 disabled={!enabledForm}
-                autoComplete="off"
+                labelWrap
                 initialValues={{
                     name: process.name,
                     contextInformation: process.contextInformation,
