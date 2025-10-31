@@ -33,7 +33,7 @@ class Process
 
     #[ODM\ReferenceOne(storeAs: 'dbRef', targetDocument: Component::class)]
     #[Groups(['process:read'])]
-    private ?Component $component = null;
+    private ?Component $component;
 
     #[ODM\ReferenceMany(storeAs: 'dbRef', targetDocument: RootRequirement::class, cascade: ['persist', 'remove'])]
     #[Groups(['process:read'])]
