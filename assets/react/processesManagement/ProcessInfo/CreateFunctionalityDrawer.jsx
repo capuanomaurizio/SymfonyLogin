@@ -11,7 +11,7 @@ const CreateFunctionalityDrawer = ({openNewFunctionDrawer, setOpenNewFunctionDra
             setOpenNewFunctionDrawer(false);
             const newFunction = await apiRequest('createFunction', {
                 'componentId': componentToEdit.id,
-                'name': values.name
+                'values': values
             });
             setComponentToEdit(prev => {
                 const updatedComponent = {

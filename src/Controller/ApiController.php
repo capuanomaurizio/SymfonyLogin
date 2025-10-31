@@ -178,9 +178,16 @@ class ApiController extends AbstractController
     #[Route('/api/createFunction', methods: ['POST'])]
     public function createFunction(Request $request): Response
     {
-        $data = $request->getPayload();
-        $component = $this->documentManager->getRepository(Component::class)->findOneBy(['id' => $data->get('componentId')]);
-        $function = (new Functionality())->setName($data->get('name'));
+        $data = json_decode($request->getContent(), true);
+        $component = $this->documentManager->getRepository(Component::class)->findOneBy(['id' => $data['componentId']]);
+        $function = (new Functionality())->setName($data['values']['name']);
+        if(isset($data['values']['requirements']))
+            foreach ($data['values']['requirements'] as $requirement) {
+                $function->addRequirement((new FunctionalityRequirement())
+                    ->setContent($requirement['content'])
+                    ->setRequirementType($requirement['type'] == 'Functional' ?
+                        FunctionalityRequirementType::FUNCTIONAL : FunctionalityRequirementType::CONTROL_FACTOR));
+            }
         $component->addFunctionality($function);
         $this->documentManager->persist($function);
         $this->documentManager->persist($component);
@@ -207,6 +214,19 @@ class ApiController extends AbstractController
         $function = $this->documentManager->getRepository(Functionality::class)->findOneBy(['id' => $data->get('functionId')]);
         $component->removeFunctionality($function);
         $this->documentManager->persist($component);
+        $this->documentManager->flush();
+        return $this->json([]);
+    }
+
+    #[Route('/api/prove')]
+    public function prove(Request $request): Response
+    {
+        $process = $this->documentManager->getRepository(Process::class)->findOneBy(['name' => 'ProcessoPrincipale']);
+        $process->addRequirement((new RootRequirement())->setContent('requisito principale')->setRequirementType(RootRequirementType::NON_FUNCTIONAL));
+        $function = $this->documentManager->getRepository(Functionality::class)->findOneBy(['name' => 'funzione1']);
+        $function->addRequirement((new FunctionalityRequirement())->setContent('requisito della funzione')->setRequirementType(FunctionalityRequirementType::FUNCTIONAL));
+        $this->documentManager->persist($process);
+        $this->documentManager->persist($function);
         $this->documentManager->flush();
         return $this->json([]);
     }
