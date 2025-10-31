@@ -2,12 +2,11 @@
 
 namespace App\Document;
 
-use App\Enum\RootRequirementType;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ODM\Document(collection: 'requirements')]
-class Requirement
+abstract class Requirement
 {
     #[ODM\Id]
     #[Groups(['process:read'])]
@@ -17,20 +16,12 @@ class Requirement
     #[Groups(['process:read'])]
     private string $content;
 
-    #[ODM\Field(type: 'string')]
-    #[Groups(['process:read'])]
-    private string $rootRequirementType;
-
-    #[ODM\Field(type: 'string')]
-    #[Groups(['process:read'])]
-    private string $nonRootRequirementType;
-
     public function getId(): ?string
     {
         return $this->id;
     }
 
-    public function setId(?string $id): Requirement
+    public function setId(?string $id): self
     {
         $this->id = $id;
         return $this;
@@ -41,31 +32,9 @@ class Requirement
         return $this->content;
     }
 
-    public function setName(string $content): Requirement
+    public function setName(string $content): self
     {
         $this->content = $content;
-        return $this;
-    }
-
-    public function getRootRequirementType(): RootRequirementType
-    {
-        return RootRequirementType::from($this->rootRequirementType);
-    }
-
-    public function setRootRequirementType(RootRequirementType $type): Requirement
-    {
-        $this->rootRequirementType = $type->value;
-        return $this;
-    }
-
-    public function getNonRootRequirementType(): RootRequirementType
-    {
-        return RootRequirementType::from($this->nonRootRequirementType);
-    }
-
-    public function setNonRootRequirementType(RootRequirementType $type): Requirement
-    {
-        $this->nonRootRequirementType = $type->value;
         return $this;
     }
 

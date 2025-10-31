@@ -1,7 +1,7 @@
 <?php
 namespace App\Enum;
 
-enum nonRootRequirementType: string {
+enum functionalityRequirementType: string {
     case CONTROL_FACTOR = 'Control factor';
     case FUNCTIONAL = 'Functional';
 
