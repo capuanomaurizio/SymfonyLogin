@@ -18,7 +18,7 @@ class Functionality
     #[Groups(['process:read'])]
     private string $name;
 
-    #[ODM\ReferenceMany(storeAs: 'dbRef', targetDocument: RootRequirement::class, cascade: ['persist', 'remove'])]
+    #[ODM\ReferenceMany(storeAs: 'dbRef', targetDocument: FunctionalityRequirement::class, cascade: ['persist', 'remove'])]
     #[Groups(['process:read'])]
     private Collection $requirements;
 
@@ -61,7 +61,5 @@ class Functionality
         }
         return $this;
     }
-
-
 
 }
