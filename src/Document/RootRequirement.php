@@ -12,16 +12,16 @@ class RootRequirement extends Requirement
 
     #[ODM\Field(type: 'string')]
     #[Groups(['process:read'])]
-    private string $rootRequirementType;
+    private string $requirementType;
 
     public function getRequirementType(): RootRequirementType
     {
-        return RootRequirementType::from($this->rootRequirementType);
+        return RootRequirementType::from($this->requirementType);
     }
 
     public function setRequirementType(RootRequirementType $type): self
     {
-        $this->rootRequirementType = $type->value;
+        $this->requirementType = $type->value;
         return $this;
     }
 

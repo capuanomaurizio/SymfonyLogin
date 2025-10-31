@@ -12,16 +12,16 @@ class FunctionalityRequirement extends Requirement
 
     #[ODM\Field(type: 'string')]
     #[Groups(['process:read'])]
-    private string $functionalityRequirementType;
+    private string $requirementType;
 
     public function getRequirementType(): FunctionalityRequirementType
     {
-        return FunctionalityRequirementType::from($this->functionalityRequirementType);
+        return FunctionalityRequirementType::from($this->requirementType);
     }
 
     public function setRequirementType(FunctionalityRequirementType $type): self
     {
-        $this->functionalityRequirementType = $type->value;
+        $this->requirementType = $type->value;
         return $this;
     }
 
