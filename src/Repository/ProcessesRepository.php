@@ -9,7 +9,7 @@ use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 
 class ProcessesRepository extends DocumentRepository
 {
-    public function getProcessTree(?Process $process): array
+    /*public function getProcessTree(?Process $process): array
     {
         if (!$process)
             return [];
@@ -41,6 +41,6 @@ class ProcessesRepository extends DocumentRepository
         }
 
         return [$process];
-    }
+    }*/
 
 }
