@@ -2,6 +2,7 @@
 
 namespace App\Document;
 
+use App\Document\AbstractClasses\Requirement;
 use App\Enum\FunctionalityRequirementType;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;

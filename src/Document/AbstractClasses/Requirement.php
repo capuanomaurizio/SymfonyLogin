@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Document;
+namespace App\Document\AbstractClasses;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Annotation\Groups;
