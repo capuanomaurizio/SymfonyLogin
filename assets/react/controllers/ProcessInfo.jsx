@@ -3,9 +3,9 @@ import React, {useEffect, useState} from 'react';
 import {apiRequest} from "../utils";
 import StepsNavigator from "../processesManagement/processInfo/StepsNavigator";
 import ProcessDetails from "../processesManagement/processInfo/ProcessDetails"
-import ComponentDrawer from "../processesManagement/processInfo/ComponentDrawer";
+import ComponentDrawer from "../processesManagement/processInfo/componentsDrawers/ComponentDrawer";
 import Components from "../processesManagement/processInfo/treeComponents/Components";
-import FunctionalityDrawer from "../processesManagement/processInfo/FunctionalityDrawer";
+import FunctionalityDrawer from "../processesManagement/processInfo/componentsDrawers/FunctionalityDrawer";
 
 export default function ProcessInfo({ processId }) {
 

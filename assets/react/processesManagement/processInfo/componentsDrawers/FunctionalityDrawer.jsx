@@ -1,6 +1,6 @@
 import {Button, Col, Drawer, Form, Input, message, Row, Select, Space} from "antd";
 import React, {useEffect} from "react";
-import {apiRequest, updateRootEdit} from "../../utils";
+import {apiRequest, updateRootEdit} from "../../../utils";
 import {MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
 
 const FunctionalityDrawer = ({setProcess, functionalityToEdit, setFunctionalityToEdit, openFunctionalityDrawer, setOpenFunctionalityDrawer}) => {

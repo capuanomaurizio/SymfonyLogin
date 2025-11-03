@@ -1,5 +1,5 @@
 import {Button, Col, Drawer, Form, Input, Row, Space, message} from "antd";
-import {apiRequest, updateRootEdit, updateRootCreate} from "../../utils";
+import {apiRequest, updateRootEdit, updateRootCreate} from "../../../utils";
 import React, {useEffect} from "react";
 
 const ComponentDrawer = ({componentToEdit, setComponentToEdit, openComponentDrawer,setOpenComponentDrawer,
