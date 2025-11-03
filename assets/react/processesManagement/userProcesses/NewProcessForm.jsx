@@ -1,5 +1,5 @@
-import {Button, Card, Col, DatePicker, Form, Input, message, Row, Select, TreeSelect} from "antd";
-import {CloseOutlined, MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
+import {Button, Card, Col, Form, Input, message, Row} from "antd";
+import {CloseOutlined} from "@ant-design/icons";
 import React from "react";
 import {apiRequest} from "../../utils";
 import '../../../styles/NewProcessForm.css'
@@ -14,7 +14,7 @@ function createProcess(values){
     }).catch(console.error);
 }
 
-const newProcessForm = ({isHidden, setHidden, components}) => {
+const newProcessForm = ({isHidden, setHidden}) => {
     return(
         <Card
             title="Crea nuovo processo"
