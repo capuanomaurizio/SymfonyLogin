@@ -1,9 +1,30 @@
-import {Dropdown, List, Space} from "antd";
+import {Dropdown, List, message, Space} from "antd";
 import Requirements from "./Requirements";
-import {DeleteOutlined, DownOutlined, EditOutlined, FileAddOutlined} from "@ant-design/icons";
-import React from "react";
+import {DeleteOutlined, DownOutlined, EditOutlined, LoginOutlined} from "@ant-design/icons";
+import React, {useEffect} from "react";
+import {apiRequest, updateRootEdit} from "../../../utils";
 
-const Functionalities = ({functionalities, showRequirements}) => {
+const Functionalities = ({functionalities, showRequirements, functionalityComponent, setProcess,
+                             setFunctionalityToEdit, setOpenFunctionalityDrawer}) => {
+
+    async function deleteFunctionality(functionalityId) {
+        try {
+            await apiRequest('deleteFunction', {'componentId': functionalityComponent.id, 'functionId': functionalityId});
+            const updatedComponent = {
+                ...functionalityComponent,
+                functionalities: functionalities.filter(f => f.id !== functionalityId)
+            };
+            setProcess(prev => ({
+                ...prev,
+                component: updateRootEdit(prev.component, functionalityComponent.id, updatedComponent)
+            }));
+            message.success("Funzione rimossa dal componente!");
+        }
+        catch (e) {
+            console.error(e)
+            message.error("Funzionalità non rimossa dal componente");
+        }
+    }
 
     function functionalityOptions(functionality) {
         const items = [
@@ -13,23 +34,24 @@ const Functionalities = ({functionalities, showRequirements}) => {
                 icon: <EditOutlined />,
             },
             {
-                key: 'add',
-                label: 'Aggiungi funzione',
-                icon: <FileAddOutlined />,
-            },
-            {
                 key: 'delete',
                 label: 'Elimina funzione',
                 icon: <DeleteOutlined />,
+            },
+            {
+                key: 'addRequirement',
+                label: 'Aggiungi requisito',
+                icon: <LoginOutlined />,
             },
         ];
         const handleMenuClick = ({ key, domEvent }) => {
             domEvent.stopPropagation();
             if (key === 'edit') {
-
-            } else if (key === 'add') {
-
+                setFunctionalityToEdit({'component': functionalityComponent, 'functionality': functionality});
+                setOpenFunctionalityDrawer(true);
             } else if (key === 'delete') {
+                deleteFunctionality(functionality.id);
+            } else if (key === 'addRequirement') {
 
             }
         };

@@ -35,3 +35,23 @@ export async function authRequest(url, payload){
         message.error('Errore di connessione al server')
     }
 }
+
+export function updateRootEdit(component, idToUpdate, updatedFields) {
+    if (component.id === idToUpdate) return { ...component, ...updatedFields };
+    if (component.childrenComponents && component.childrenComponents.length > 0) {
+        component.childrenComponents = component.childrenComponents
+            .map(child => updateRootEdit(child, idToUpdate, updatedFields))
+            .filter(child => child !== null);
+    }
+    return component;
+}
+
+export function updateRootCreate(component, parentId, newComponent) {
+    if (component.id === parentId) return { ...component, childrenComponents: [...component.childrenComponents, newComponent] };
+    if (component.childrenComponents && component.childrenComponents.length > 0) {
+        component.childrenComponents = component.childrenComponents
+            .map(child => updateRootCreate(child, parentId, newComponent))
+            .filter(child => child !== null);
+    }
+    return component;
+}

@@ -3,9 +3,9 @@ import React, {useEffect, useState} from 'react';
 import {apiRequest} from "../utils";
 import StepsNavigator from "../processesManagement/processInfo/StepsNavigator";
 import ProcessDetails from "../processesManagement/processInfo/ProcessDetails"
-import ComponentsTree from "../processesManagement/processInfo/ComponentsTree";
-import EditComponentDrawer from "../processesManagement/processInfo/EditComponentDrawer";
-import CreateComponentDrawer from "../processesManagement/processInfo/CreateComponentDrawer";
+import ComponentDrawer from "../processesManagement/processInfo/ComponentDrawer";
+import Components from "../processesManagement/processInfo/treeComponents/Components";
+import FunctionalityDrawer from "../processesManagement/processInfo/FunctionalityDrawer";
 
 export default function ProcessInfo({ processId }) {
 
@@ -13,14 +13,11 @@ export default function ProcessInfo({ processId }) {
     const [page, setPage] = useState(0);
 
     const [componentToEdit, setComponentToEdit] = useState(null)
-    const [functionToEdit, setFunctionToEdit] = useState(null)
-    const [functionToDelete, setFunctionToDelete] = useState(null)
+    const [functionalityToEdit, setFunctionalityToEdit] = useState({'component': null, 'functionality': null})
     const [parentOfComponentToCreate, setParentOfComponentToCreate] = useState(null)
 
-    const [openEditDrawer, setOpenEditDrawer] = useState(false);
-    const [openCreateDrawer, setOpenCreateDrawer] = useState(false);
-    const [openEditFunctionDrawer, setOpenEditFunctionDrawer] = useState(false);
-    const [openNewFunctionDrawer, setOpenNewFunctionDrawer] = useState(false);
+    const [openComponentDrawer, setOpenComponentDrawer] = useState(false);
+    const [openFunctionalityDrawer, setOpenFunctionalityDrawer] = useState(false);
 
     const fetchProcesses = () => {
         apiRequest('processesList')
@@ -47,37 +44,35 @@ export default function ProcessInfo({ processId }) {
             <ProcessDetails process={process} setProcess={setProcess}></ProcessDetails>
         ) : (
             <>
-            <ComponentsTree
+            <Components
                 process={process}
                 setProcess={setProcess}
-                setComponentToEdit={setComponentToEdit}
-                setOpenEditDrawer={setOpenEditDrawer}
-                setParentOfComponentToCreate={setParentOfComponentToCreate}
-                setOpenCreateDrawer={setOpenCreateDrawer}
-                setOpenEditFunctionDrawer={setOpenEditFunctionDrawer}
-                setFunctionToEdit={setFunctionToEdit}
-                setFunctionToDelete={setFunctionToDelete}
-            ></ComponentsTree>
-            <EditComponentDrawer
                 componentToEdit={componentToEdit}
                 setComponentToEdit={setComponentToEdit}
-                functionToEdit={functionToEdit}
-                setFunctionToEdit={setFunctionToEdit}
-                openEditDrawer={openEditDrawer}
-                setOpenEditDrawer={setOpenEditDrawer}
-                openNewFunctionDrawer={openNewFunctionDrawer}
-                setOpenNewFunctionDrawer={setOpenNewFunctionDrawer}
-                openEditFunctionDrawer={openEditFunctionDrawer}
-                setOpenEditFunctionDrawer={setOpenEditFunctionDrawer}
-                setProcess={setProcess}
-                functionToDelete={functionToDelete}
-            ></EditComponentDrawer>
-            <CreateComponentDrawer
+                setOpenComponentDrawer={setOpenComponentDrawer}
+                setParentOfComponentToCreate={setParentOfComponentToCreate}
+                setFunctionalityToEdit={setFunctionalityToEdit}
+                setOpenFunctionalityDrawer={setOpenFunctionalityDrawer}
+            ></Components>
+            <ComponentDrawer
+                componentToEdit={componentToEdit}
+                setComponentToEdit={setComponentToEdit}
+                openComponentDrawer={openComponentDrawer}
+                setOpenComponentDrawer={setOpenComponentDrawer}
                 parentOfComponentToCreate={parentOfComponentToCreate}
-                openCreateDrawer={openCreateDrawer}
-                setOpenCreateDrawer={setOpenCreateDrawer}
                 setProcess={setProcess}
-            ></CreateComponentDrawer>
+            ></ComponentDrawer>
+            <FunctionalityDrawer
+                setProcess={setProcess}
+                componentToEdit={componentToEdit}
+                setComponentToEdit={setComponentToEdit}
+                functionalityToEdit={functionalityToEdit}
+                setFunctionalityToEdit={setFunctionalityToEdit}
+                openFunctionalityDrawer={openFunctionalityDrawer}
+                setOpenFunctionalityDrawer={setOpenFunctionalityDrawer}
+            >
+
+            </FunctionalityDrawer>
             </>
         )}
         </>

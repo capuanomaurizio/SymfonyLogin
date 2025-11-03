@@ -1,7 +1,7 @@
 import {Collapse, ConfigProvider, Dropdown, message, Space, Switch} from "antd";
 import React, {useState} from "react";
 import {apiRequest} from "../../../utils";
-import {DeleteOutlined, DownOutlined, EditOutlined, FileAddOutlined} from "@ant-design/icons";
+import {DeleteOutlined, DownOutlined, EditOutlined, FileAddOutlined, FunctionOutlined, LoginOutlined} from "@ant-design/icons";
 import Functionalities from "./Functionalities";
 
 function findParentComponent(component, childId) {
@@ -24,8 +24,8 @@ function filterRoot(component, idToRemove) {
     return component;
 }
 
-const Components = ({process, setProcess, setComponentToEdit, setOpenEditDrawer, setParentOfComponentToCreate,
-                            setOpenCreateDrawer,setOpenEditFunctionDrawer, setFunctionToEdit, setFunctionToDelete}) => {
+const Components = ({process, setProcess, componentToEdit, setComponentToEdit, setOpenComponentDrawer, setParentOfComponentToCreate,
+                        setFunctionalityToEdit, setOpenFunctionalityDrawer}) => {
 
     const [showRequirements, setShowRequirements] = useState(true);
     const [showFunctionalities, setShowFunctionalities] = useState(true);
@@ -53,6 +53,10 @@ const Components = ({process, setProcess, setComponentToEdit, setOpenEditDrawer,
             <Functionalities
                 functionalities={component.functionalities}
                 showRequirements={showRequirements}
+                functionalityComponent={component}
+                setProcess={setProcess}
+                setFunctionalityToEdit={setFunctionalityToEdit}
+                setOpenFunctionalityDrawer={setOpenFunctionalityDrawer}
             ></Functionalities> ) : null;
 
         const childrenContent = (
@@ -94,17 +98,25 @@ const Components = ({process, setProcess, setComponentToEdit, setOpenEditDrawer,
                 label: 'Elimina componente',
                 icon: <DeleteOutlined />,
             },
+            {
+                key: 'addFunctionality',
+                label: 'Nuova funzione',
+                icon: <FunctionOutlined />,
+            },
         ];
         const handleMenuClick = ({ key, domEvent }) => {
             domEvent.stopPropagation();
             if (key === 'edit') {
                 setComponentToEdit(component);
-                setOpenEditDrawer(true);
+                setOpenComponentDrawer(true);
             } else if (key === 'add') {
                 setParentOfComponentToCreate(component);
-                setOpenCreateDrawer(true);
+                setOpenComponentDrawer(true);
             } else if (key === 'delete') {
                 deleteComponent(process.component, component.id)
+            } else if (key === 'addFunctionality') {
+                setFunctionalityToEdit({'component': component, 'functionality': null});
+                setOpenFunctionalityDrawer(true);
             }
         };
 
@@ -152,21 +164,22 @@ const Components = ({process, setProcess, setComponentToEdit, setOpenEditDrawer,
                 }}
             >
                     <Space>
-                        <FileAddOutlined style={{ color: "deeppink" }} />
+                        <FunctionOutlined style={{ color: "deeppink" }} />
                         <span style={{ fontSize: 13, opacity: 0.85 }}>Visualizza funzionalità dei componenti</span>
                         <Switch
                             size="small"
                             checked={showFunctionalities}
-                            onChange={setShowFunctionalities}
+                            onChange={() => {setShowFunctionalities(!showFunctionalities); setShowRequirements(false)}}
                             style={{
                                 backgroundColor: showFunctionalities ? "deeppink" : "",
                             }}
                         />
                     </Space>
                     <Space>
-                        <EditOutlined style={{ color: "rebeccapurple" }} />
+                        <LoginOutlined style={{ color: "rebeccapurple" }} />
                         <span style={{ fontSize: 13, opacity: 0.85 }}>Visualizza requisiti delle funzioni</span>
                         <Switch
+                            disabled={!showFunctionalities}
                             size="small"
                             checked={showRequirements}
                             onChange={setShowRequirements}

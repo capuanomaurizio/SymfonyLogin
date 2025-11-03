@@ -11,11 +11,6 @@ const Requirements = ({ requirements }) => {
                 icon: <EditOutlined />,
             },
             {
-                key: 'add',
-                label: 'Aggiungi requisito',
-                icon: <FileAddOutlined />,
-            },
-            {
                 key: "delete",
                 label: "Elimina requisito",
                 icon: <DeleteOutlined />,
@@ -26,11 +21,10 @@ const Requirements = ({ requirements }) => {
             domEvent.stopPropagation();
             if (key === 'edit') {
 
-            } else if (key === 'add') {
-
             } else if (key === 'delete') {
 
-            }        };
+            }
+        };
 
         return (
             <Dropdown menu={{ items, onClick: handleMenuClick }}>
