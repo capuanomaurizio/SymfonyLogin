@@ -1,7 +1,7 @@
 import {Dropdown, List, message, Space} from "antd";
 import Requirements from "./Requirements";
 import {DeleteOutlined, DownOutlined, EditOutlined, LoginOutlined} from "@ant-design/icons";
-import React, {useEffect} from "react";
+import React from "react";
 import {apiRequest, updateRootEdit} from "../../../utils";
 
 const Functionalities = ({functionalities, showRequirements, functionalityComponent, setProcess,

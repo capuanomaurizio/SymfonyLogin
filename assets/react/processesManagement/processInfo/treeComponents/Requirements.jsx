@@ -1,5 +1,5 @@
 import { Dropdown, List, Space } from "antd";
-import {DeleteOutlined, DownOutlined, EditOutlined, FileAddOutlined} from "@ant-design/icons";
+import {DeleteOutlined, DownOutlined, EditOutlined} from "@ant-design/icons";
 import React from "react";
 
 const Requirements = ({ requirements }) => {

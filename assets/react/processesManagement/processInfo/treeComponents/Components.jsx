@@ -24,7 +24,7 @@ function filterRoot(component, idToRemove) {
     return component;
 }
 
-const Components = ({process, setProcess, componentToEdit, setComponentToEdit, setOpenComponentDrawer, setParentOfComponentToCreate,
+const Components = ({process, setProcess, setComponentToEdit, setOpenComponentDrawer, setParentOfComponentToCreate,
                         setFunctionalityToEdit, setOpenFunctionalityDrawer}) => {
 
     const [showRequirements, setShowRequirements] = useState(true);

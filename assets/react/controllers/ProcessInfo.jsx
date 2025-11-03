@@ -39,40 +39,35 @@ export default function ProcessInfo({ processId }) {
 
     return (
         <>
-        <StepsNavigator page={page} setPage={setPage}></StepsNavigator>
+        <StepsNavigator page={page} setPage={setPage} />
         {page === 0 ? (
-            <ProcessDetails process={process} setProcess={setProcess}></ProcessDetails>
+            <ProcessDetails process={process} setProcess={setProcess} />
         ) : (
             <>
-            <Components
-                process={process}
-                setProcess={setProcess}
-                componentToEdit={componentToEdit}
-                setComponentToEdit={setComponentToEdit}
-                setOpenComponentDrawer={setOpenComponentDrawer}
-                setParentOfComponentToCreate={setParentOfComponentToCreate}
-                setFunctionalityToEdit={setFunctionalityToEdit}
-                setOpenFunctionalityDrawer={setOpenFunctionalityDrawer}
-            ></Components>
-            <ComponentDrawer
-                componentToEdit={componentToEdit}
-                setComponentToEdit={setComponentToEdit}
-                openComponentDrawer={openComponentDrawer}
-                setOpenComponentDrawer={setOpenComponentDrawer}
-                parentOfComponentToCreate={parentOfComponentToCreate}
-                setProcess={setProcess}
-            ></ComponentDrawer>
-            <FunctionalityDrawer
-                setProcess={setProcess}
-                componentToEdit={componentToEdit}
-                setComponentToEdit={setComponentToEdit}
-                functionalityToEdit={functionalityToEdit}
-                setFunctionalityToEdit={setFunctionalityToEdit}
-                openFunctionalityDrawer={openFunctionalityDrawer}
-                setOpenFunctionalityDrawer={setOpenFunctionalityDrawer}
-            >
-
-            </FunctionalityDrawer>
+                <Components
+                    process={process}
+                    setProcess={setProcess}
+                    setComponentToEdit={setComponentToEdit}
+                    setOpenComponentDrawer={setOpenComponentDrawer}
+                    setParentOfComponentToCreate={setParentOfComponentToCreate}
+                    setFunctionalityToEdit={setFunctionalityToEdit}
+                    setOpenFunctionalityDrawer={setOpenFunctionalityDrawer}
+                />
+                <ComponentDrawer
+                    componentToEdit={componentToEdit}
+                    setComponentToEdit={setComponentToEdit}
+                    openComponentDrawer={openComponentDrawer}
+                    setOpenComponentDrawer={setOpenComponentDrawer}
+                    parentOfComponentToCreate={parentOfComponentToCreate}
+                    setProcess={setProcess}
+                />
+                <FunctionalityDrawer
+                    setProcess={setProcess}
+                    functionalityToEdit={functionalityToEdit}
+                    setFunctionalityToEdit={setFunctionalityToEdit}
+                    openFunctionalityDrawer={openFunctionalityDrawer}
+                    setOpenFunctionalityDrawer={setOpenFunctionalityDrawer}
+                />
             </>
         )}
         </>
