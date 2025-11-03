@@ -93,17 +93,9 @@ class ApiController extends AbstractController
     public function createProcess(Request $request): Response
     {
         $data = json_decode($request->getContent(), true);
-        $rootComponent = $this->documentManager->getRepository(Component::class)->findOneBy(['id' => $data['rootId']]);
+        $rootComponent = (new Component())->setName($data['name']);
         $process = (new Process())->setName($data['name'])
-            ->setContextInformation($data['contextInformation'])
-            ->setExpirationDate(new \DateTime($data['expirationDate']))
             ->setComponent($rootComponent);
-        if(isset($data['requirements']))
-            foreach ($data['requirements'] as $requirement) {
-                $process->addRequirement((new RootRequirement())
-                    ->setContent($requirement['content'])
-                    ->setRequirementType($requirement['type'] == 'NonFunctional' ? RootRequirementType::NON_FUNCTIONAL : RootRequirementType::UNINTENDED_OUTPUT));
-            }
         $this->documentManager->persist($process);
         $this->documentManager->flush();
         return $this->json([
@@ -124,6 +116,15 @@ class ApiController extends AbstractController
         $process->setName($values['name'])
             ->setContextInformation($values['contextInformation'])
             ->setExpirationDate(new \DateTime($values['expirationDate']));
+        /*
+         *
+         * if(isset($data['requirements']))
+            foreach ($data['requirements'] as $requirement) {
+                $process->addRequirement((new RootRequirement())
+                    ->setContent($requirement['content'])
+                    ->setRequirementType($requirement['type'] == 'NonFunctional' ? RootRequirementType::NON_FUNCTIONAL : RootRequirementType::UNINTENDED_OUTPUT));
+            }
+         */
         $this->documentManager->persist($process);
         $this->documentManager->flush();
         return $this->json($process);
@@ -205,10 +206,18 @@ class ApiController extends AbstractController
             $function->setName($data['values']['name']);
         if(isset($data['values']['requirements']))
             foreach ($data['values']['requirements'] as $requirement) {
-                $function->addRequirement((new FunctionalityRequirement())
-                    ->setContent($requirement['content'])
-                    ->setRequirementType($requirement['type'] == 'Functional' ?
-                        FunctionalityRequirementType::FUNCTIONAL : FunctionalityRequirementType::CONTROL_FACTOR));
+                if(isset($requirement['id'])){
+                    $req = $function->getRequirementById($requirement['id']);
+                    $req->setContent($requirement['content']);
+                    $req->setRequirementType($requirement['type'] == 'Functional' ?
+                        FunctionalityRequirementType::FUNCTIONAL : FunctionalityRequirementType::CONTROL_FACTOR);
+                }
+                else {
+                    $function->addRequirement((new FunctionalityRequirement())
+                        ->setContent($requirement['content'])
+                        ->setRequirementType($requirement['type'] == 'Functional' ?
+                            FunctionalityRequirementType::FUNCTIONAL : FunctionalityRequirementType::CONTROL_FACTOR));
+                }
             }
         $this->documentManager->persist($function);
         $this->documentManager->flush();

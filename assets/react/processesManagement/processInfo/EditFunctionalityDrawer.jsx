@@ -1,5 +1,5 @@
 import {Button, Col, Drawer, Form, Input, message, Row, Select, Space} from "antd";
-import React from "react";
+import React, {useEffect} from "react";
 import {apiRequest} from "../../utils";
 import {PlusOutlined} from "@ant-design/icons";
 
@@ -7,6 +7,21 @@ const EditFunctionalityDrawer = ({functionToEdit, openEditFunctionDrawer, setOpe
                                  componentToEdit, setComponentToEdit, setProcess, updateRoot}) => {
 
     const [form] = Form.useForm();
+
+    useEffect(() => {
+        if (functionToEdit) {
+            form.setFieldsValue({
+                name: functionToEdit.name || "",
+                requirements: functionToEdit.requirements?.map(r => ({
+                    content: r.content || "",
+                    type: r.type === 'Control factor' ? 'ControlFactor' : 'Functional' || "",
+                    id: r.id
+                })) || [],
+            });
+        } else {
+            form.resetFields();
+        }
+    }, [functionToEdit, form]);
 
     const handleClose = () => {
         setOpenEditFunctionDrawer(false);
@@ -54,7 +69,8 @@ const EditFunctionalityDrawer = ({functionToEdit, openEditFunctionDrawer, setOpe
         >
             <Form
                 form={form}
-                layout="vertical" requiredMark={false}
+                layout="vertical"
+                requiredMark={false}
                 id="editFunctionForm"
                 onFinish={(values) => {
                     editFunction(values);
@@ -111,6 +127,11 @@ const EditFunctionalityDrawer = ({functionToEdit, openEditFunctionDrawer, setOpe
                                                         ]}
                                                     />
                                                 </Form.Item>
+                                                <Form.Item
+                                                    name={[name, 'id']}
+                                                    hidden
+                                                    noStyle
+                                                />
                                             </Form.Item>
                                         ))}
                                         <Form.Item>

@@ -31,7 +31,7 @@ class Process
     #[Groups(['process:read'])]
     private ?\DateTime $expirationDate = null;
 
-    #[ODM\ReferenceOne(storeAs: 'dbRef', targetDocument: Component::class)]
+    #[ODM\ReferenceOne(storeAs: 'dbRef', targetDocument: Component::class, cascade: ['persist', 'remove'])]
     #[Groups(['process:read'])]
     private ?Component $component;
 
