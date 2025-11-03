@@ -62,14 +62,10 @@ class Functionality
         return $this;
     }
 
-    public function getRequirementById(string $id): ?FunctionalityRequirement
+    public function removeRequirements(): Functionality
     {
-        foreach($this->requirements as $requirement){
-            if($requirement->getId() === $id){
-                return $requirement;
-            }
-        }
-        return null;
+        $this->requirements = new ArrayCollection();
+        return $this;
     }
 
 }

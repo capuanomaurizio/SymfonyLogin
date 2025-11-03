@@ -1,7 +1,7 @@
 import {Button, Col, Drawer, Form, Input, message, Row, Select, Space} from "antd";
 import React, {useEffect} from "react";
 import {apiRequest} from "../../utils";
-import {PlusOutlined} from "@ant-design/icons";
+import {MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
 
 const EditFunctionalityDrawer = ({functionToEdit, openEditFunctionDrawer, setOpenEditFunctionDrawer,
                                  componentToEdit, setComponentToEdit, setProcess, updateRoot}) => {
@@ -76,6 +76,14 @@ const EditFunctionalityDrawer = ({functionToEdit, openEditFunctionDrawer, setOpe
                     editFunction(values);
                     handleClose()
                 }}
+                initialValues={{
+                    name: functionToEdit?.name || "",
+                    requirements: functionToEdit?.requirements?.map(r => ({
+                        content: r.content || "",
+                        type: r.type === 'Control factor' ? 'ControlFactor' : 'Functional' || "",
+                        id: r.id
+                    })) || []
+                }}
             >
                 <Row gutter={16}>
                     <Col span={18}>
@@ -90,7 +98,7 @@ const EditFunctionalityDrawer = ({functionToEdit, openEditFunctionDrawer, setOpe
                             required={false}
                         >
                             <Form.List name="requirements">
-                                {(fields, { add }) => (
+                                {(fields, { add, remove }) => (
                                     <>
                                         {fields.map(({ key, name}) => (
                                             <Form.Item required={false} key={key}>
@@ -120,17 +128,16 @@ const EditFunctionalityDrawer = ({functionToEdit, openEditFunctionDrawer, setOpe
                                                 >
                                                     <Select
                                                         placeholder="Tipologia di requisito"
-                                                        style={{ width: '40%', marginLeft: 5 }}
+                                                        style={{ width: '30%', marginLeft: 5 }}
                                                         options={[
                                                             { value: 'ControlFactor', label: 'Control factor' },
                                                             { value: 'Functional', label: 'Functional' },
                                                         ]}
                                                     />
                                                 </Form.Item>
-                                                <Form.Item
-                                                    name={[name, 'id']}
-                                                    hidden
-                                                    noStyle
+                                                <MinusCircleOutlined
+                                                    className="dynamic-delete-button"
+                                                    onClick={() => remove(name)}
                                                 />
                                             </Form.Item>
                                         ))}

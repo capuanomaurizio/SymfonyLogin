@@ -116,15 +116,18 @@ class ApiController extends AbstractController
         $process->setName($values['name'])
             ->setContextInformation($values['contextInformation'])
             ->setExpirationDate(new \DateTime($values['expirationDate']));
-        /*
-         *
-         * if(isset($data['requirements']))
-            foreach ($data['requirements'] as $requirement) {
+        if(isset($values['requirements'])){
+            foreach ($process->getRequirements() as $requirement){
+                $this->documentManager->remove($requirement);
+            }
+            $process->removeRequirements();
+            foreach ($values['requirements'] as $requirement) {
                 $process->addRequirement((new RootRequirement())
                     ->setContent($requirement['content'])
-                    ->setRequirementType($requirement['type'] == 'NonFunctional' ? RootRequirementType::NON_FUNCTIONAL : RootRequirementType::UNINTENDED_OUTPUT));
+                    ->setRequirementType($requirement['type'] == 'NonFunctional' ?
+                        RootRequirementType::NON_FUNCTIONAL : RootRequirementType::UNINTENDED_OUTPUT));
             }
-         */
+        }
         $this->documentManager->persist($process);
         $this->documentManager->flush();
         return $this->json($process);
@@ -201,24 +204,22 @@ class ApiController extends AbstractController
     public function editFunction(Request $request): Response
     {
         $data = json_decode($request->getContent(), true);
+        $values = $data['values'];
         $function = $this->documentManager->getRepository(Functionality::class)->findOneBy(['id' => $data['functionId']]);
-        if(!empty($data['values']['name']))
-            $function->setName($data['values']['name']);
-        if(isset($data['values']['requirements']))
-            foreach ($data['values']['requirements'] as $requirement) {
-                if(isset($requirement['id'])){
-                    $req = $function->getRequirementById($requirement['id']);
-                    $req->setContent($requirement['content']);
-                    $req->setRequirementType($requirement['type'] == 'Functional' ?
-                        FunctionalityRequirementType::FUNCTIONAL : FunctionalityRequirementType::CONTROL_FACTOR);
-                }
-                else {
-                    $function->addRequirement((new FunctionalityRequirement())
-                        ->setContent($requirement['content'])
-                        ->setRequirementType($requirement['type'] == 'Functional' ?
-                            FunctionalityRequirementType::FUNCTIONAL : FunctionalityRequirementType::CONTROL_FACTOR));
-                }
+        if(!empty($values['name']))
+            $function->setName($values['name']);
+        if(isset($values['requirements'])){
+            foreach ($function->getRequirements() as $requirement){
+                $this->documentManager->remove($requirement);
             }
+            $function->removeRequirements();
+            foreach ($values['requirements'] as $requirement) {
+                $function->addRequirement((new FunctionalityRequirement())
+                    ->setContent($requirement['content'])
+                    ->setRequirementType($requirement['type'] == 'Functional' ?
+                        FunctionalityRequirementType::FUNCTIONAL : FunctionalityRequirementType::CONTROL_FACTOR));
+            }
+        }
         $this->documentManager->persist($function);
         $this->documentManager->flush();
         return $this->json($function);

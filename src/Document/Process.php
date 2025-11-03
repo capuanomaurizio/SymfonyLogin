@@ -119,4 +119,10 @@ class Process
         return $this;
     }
 
+    public function removeRequirements(): Process
+    {
+        $this->requirements = new ArrayCollection();
+        return $this;
+    }
+
 }
