@@ -1,8 +1,37 @@
-import { Dropdown, List, Space } from "antd";
+import {Dropdown, List, message, Space} from "antd";
 import {DeleteOutlined, DownOutlined, EditOutlined} from "@ant-design/icons";
 import React from "react";
+import {apiRequest, updateRootEdit} from "../../../utils";
 
-const Requirements = ({ requirements }) => {
+const Requirements = ({ setProcess, requirements, functionalityComponent, requirementFunctionality,
+                          setRequirementToEdit, setOpenRequirementDrawer }) => {
+
+    async function deleteRequirement(requirementId) {
+        try {
+            await apiRequest('deleteRequirement', {functionId: requirementFunctionality.id, requirementId});
+            const updatedComponent = {
+                ...functionalityComponent,
+                functionalities: functionalityComponent.functionalities.map(func => {
+                    if (func.id === requirementFunctionality.id) {
+                        return {
+                            ...func,
+                            requirements: func.requirements.filter(req => req.id !== requirementId),
+                        };
+                    }
+                    return func;
+                }),
+            };
+            setProcess(prev => ({
+                ...prev,
+                component: updateRootEdit(prev.component, functionalityComponent.id, updatedComponent),
+            }));
+            message.success("Requisito rimosso dalla funzionalità!");
+        } catch (e) {
+            console.error(e)
+            message.error("Requisito non rimosso dalla funzionalità");
+        }
+    }
+
     const requirementOptions = (requirement) => {
         const items = [
             {
@@ -20,9 +49,14 @@ const Requirements = ({ requirements }) => {
         const handleMenuClick = ({ key, domEvent }) => {
             domEvent.stopPropagation();
             if (key === 'edit') {
-
+                setOpenRequirementDrawer(true);
+                setRequirementToEdit({
+                    'component': functionalityComponent,
+                    'functionality': requirementFunctionality,
+                    'requirement': requirement
+                })
             } else if (key === 'delete') {
-
+                deleteRequirement(requirement.id)
             }
         };
 

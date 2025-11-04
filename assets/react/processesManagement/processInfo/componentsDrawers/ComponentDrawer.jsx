@@ -49,7 +49,7 @@ const ComponentDrawer = ({componentToEdit, setComponentToEdit, openComponentDraw
     return(
         <Drawer
             title={componentToEdit ? "Modifica componente "+componentToEdit?.name : "Crea nuovo componente"}
-            width={920}
+            width={620}
             onClose={handleClose}
             open={openComponentDrawer}
             extra={

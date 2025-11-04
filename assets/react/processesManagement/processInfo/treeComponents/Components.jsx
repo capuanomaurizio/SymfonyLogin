@@ -25,7 +25,7 @@ function filterRoot(component, idToRemove) {
 }
 
 const Components = ({process, setProcess, setComponentToEdit, setOpenComponentDrawer, setParentOfComponentToCreate,
-                        setFunctionalityToEdit, setOpenFunctionalityDrawer}) => {
+                        setFunctionalityToEdit, setOpenFunctionalityDrawer, setRequirementToEdit, setOpenRequirementDrawer}) => {
 
     const [showRequirements, setShowRequirements] = useState(true);
     const [showFunctionalities, setShowFunctionalities] = useState(true);
@@ -33,7 +33,7 @@ const Components = ({process, setProcess, setComponentToEdit, setOpenComponentDr
     async function deleteComponent(root, id) {
         try {
             const parent = findParentComponent(root, id)
-            await apiRequest('deleteComponent', {'parentId': parent.id, 'id': id});
+            await apiRequest('deleteComponent', {parentId: parent.id, id});
             setProcess(prev => ({
                 ...prev,
                 component: filterRoot(prev.component, id)
@@ -57,6 +57,8 @@ const Components = ({process, setProcess, setComponentToEdit, setOpenComponentDr
                 setProcess={setProcess}
                 setFunctionalityToEdit={setFunctionalityToEdit}
                 setOpenFunctionalityDrawer={setOpenFunctionalityDrawer}
+                setRequirementToEdit={setRequirementToEdit}
+                setOpenRequirementDrawer={setOpenRequirementDrawer}
             ></Functionalities> ) : null;
 
         const childrenContent = (

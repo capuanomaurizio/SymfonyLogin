@@ -62,6 +62,12 @@ class Functionality
         return $this;
     }
 
+    public function removeRequirement(FunctionalityRequirement $requirement): Functionality
+    {
+        $this->requirements->removeElement($requirement);
+        return $this;
+    }
+
     public function removeRequirements(): Functionality
     {
         $this->requirements = new ArrayCollection();

@@ -150,7 +150,6 @@ class ApiController extends AbstractController
         $parentComponent = $this->documentManager->getRepository(Component::class)->findOneBy(['id' => $data->get('parentId')]);
         $component = (new Component())->setName($data->get('name'));
         $parentComponent->addChildComponent($component);
-        $this->documentManager->persist($component);
         $this->documentManager->persist($parentComponent);
         $this->documentManager->flush();
         return $this->json($component);
@@ -174,8 +173,8 @@ class ApiController extends AbstractController
         $parent = $this->documentManager->getRepository(Component::class)->findOneBy(['id' => $data->get('parentId')]);
         $child = $this->documentManager->getRepository(Component::class)->findOneBy(['id' => $data->get('id')]);
         $parent->removeChildComponent($child);
-        $this->documentManager->persist($parent);
         $this->documentManager->remove($child);
+        $this->documentManager->persist($parent);
         $this->documentManager->flush();
         return $this->json([]);
     }
@@ -186,15 +185,7 @@ class ApiController extends AbstractController
         $data = json_decode($request->getContent(), true);
         $component = $this->documentManager->getRepository(Component::class)->findOneBy(['id' => $data['componentId']]);
         $function = (new Functionality())->setName($data['values']['name']);
-        if(isset($data['values']['requirements']))
-            foreach ($data['values']['requirements'] as $requirement) {
-                $function->addRequirement((new FunctionalityRequirement())
-                    ->setContent($requirement['content'])
-                    ->setRequirementType($requirement['type'] == 'Functional' ?
-                        FunctionalityRequirementType::FUNCTIONAL : FunctionalityRequirementType::CONTROL_FACTOR));
-            }
         $component->addFunctionality($function);
-        $this->documentManager->persist($function);
         $this->documentManager->persist($component);
         $this->documentManager->flush();
         return $this->json($function);
@@ -206,20 +197,7 @@ class ApiController extends AbstractController
         $data = json_decode($request->getContent(), true);
         $values = $data['values'];
         $function = $this->documentManager->getRepository(Functionality::class)->findOneBy(['id' => $data['functionId']]);
-        if(!empty($values['name']))
-            $function->setName($values['name']);
-        if(isset($values['requirements'])){
-            foreach ($function->getRequirements() as $requirement){
-                $this->documentManager->remove($requirement);
-            }
-            $function->removeRequirements();
-            foreach ($values['requirements'] as $requirement) {
-                $function->addRequirement((new FunctionalityRequirement())
-                    ->setContent($requirement['content'])
-                    ->setRequirementType($requirement['type'] == 'Functional' ?
-                        FunctionalityRequirementType::FUNCTIONAL : FunctionalityRequirementType::CONTROL_FACTOR));
-            }
-        }
+        $function->setName($values['name']);
         $this->documentManager->persist($function);
         $this->documentManager->flush();
         return $this->json($function);
@@ -236,6 +214,48 @@ class ApiController extends AbstractController
         $this->documentManager->remove($function);
         $this->documentManager->flush();
         return $this->json([]);
+    }
+
+    #[Route('/api/createRequirement', methods: ['POST'])]
+    public function createRequirement(Request $request): Response
+    {
+        $data = json_decode($request->getContent(), true);
+        $function = $this->documentManager->getRepository(Functionality::class)->findOneBy(['id' => $data['functionalityId']]);
+        $requirement = (new FunctionalityRequirement())
+            ->setContent($data['values']['content'])
+            ->setRequirementType($data['values']['type'] == 'Functional' ?
+                FunctionalityRequirementType::FUNCTIONAL : FunctionalityRequirementType::CONTROL_FACTOR);
+        $function->addRequirement($requirement);
+        $this->documentManager->persist($function);
+        $this->documentManager->flush();
+        return $this->json($requirement);
+    }
+
+    #[Route('/api/editRequirement', methods: ['POST'])]
+    public function editRequirement(Request $request): Response
+    {
+        $data = json_decode($request->getContent(), true);
+        $values = $data['values'];
+        $requirement = $this->documentManager->getRepository(FunctionalityRequirement::class)->findOneBy(['id' => $data['requirementId']]);
+        $requirement->setContent($values['content'])
+                    ->setRequirementType($values['type'] == 'Functional' ?
+                        FunctionalityRequirementType::FUNCTIONAL : FunctionalityRequirementType::CONTROL_FACTOR);
+        $this->documentManager->persist($requirement);
+        $this->documentManager->flush();
+        return $this->json($requirement);
+    }
+
+    #[Route('/api/deleteRequirement', methods: ['POST'])]
+    public function deleteRequirement(Request $request): Response
+    {
+        $data = $request->getPayload();
+        $function = $this->documentManager->getRepository(Functionality::class)->findOneBy(['id' => $data->get('functionId')]);
+        $requirement = $this->documentManager->getRepository(FunctionalityRequirement::class)->findOneBy(['id' => $data->get('requirementId')]);
+        $function->removeRequirement($requirement);
+        $this->documentManager->persist($function);
+        $this->documentManager->remove($requirement);
+        $this->documentManager->flush();
+        return $this->json($function);
     }
 
 }

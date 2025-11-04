@@ -5,11 +5,12 @@ import React from "react";
 import {apiRequest, updateRootEdit} from "../../../utils";
 
 const Functionalities = ({functionalities, showRequirements, functionalityComponent, setProcess,
-                             setFunctionalityToEdit, setOpenFunctionalityDrawer}) => {
+                             setFunctionalityToEdit, setOpenFunctionalityDrawer,
+                                setRequirementToEdit, setOpenRequirementDrawer}) => {
 
     async function deleteFunctionality(functionalityId) {
         try {
-            await apiRequest('deleteFunction', {'componentId': functionalityComponent.id, 'functionId': functionalityId});
+            await apiRequest('deleteFunction', {componentId: functionalityComponent.id, functionId: functionalityId});
             const updatedComponent = {
                 ...functionalityComponent,
                 functionalities: functionalities.filter(f => f.id !== functionalityId)
@@ -52,7 +53,8 @@ const Functionalities = ({functionalities, showRequirements, functionalityCompon
             } else if (key === 'delete') {
                 deleteFunctionality(functionality.id);
             } else if (key === 'addRequirement') {
-
+                setRequirementToEdit({'component': functionalityComponent, 'functionality': functionality, 'requirement': null});
+                setOpenRequirementDrawer(true);
             }
         };
 
@@ -102,7 +104,14 @@ const Functionalities = ({functionalities, showRequirements, functionalityCompon
                         </div>
                         <div style={{ width: "100%" }}>
                             {showRequirements && func.requirements?.length > 0 && (
-                                <Requirements requirements={func.requirements} />
+                                <Requirements
+                                    setProcess={setProcess}
+                                    requirements={func.requirements}
+                                    functionalityComponent={functionalityComponent}
+                                    requirementFunctionality={func}
+                                    setRequirementToEdit={setRequirementToEdit}
+                                    setOpenRequirementDrawer={setOpenRequirementDrawer}
+                                />
                             )}
                         </div>
                     </List.Item>

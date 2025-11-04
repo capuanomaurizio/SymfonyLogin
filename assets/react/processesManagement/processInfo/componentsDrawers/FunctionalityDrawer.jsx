@@ -1,7 +1,6 @@
-import {Button, Col, Drawer, Form, Input, message, Row, Select, Space} from "antd";
+import {Button, Col, Drawer, Form, Input, message, Row, Space} from "antd";
 import React, {useEffect} from "react";
 import {apiRequest, updateRootEdit} from "../../../utils";
-import {MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
 
 const FunctionalityDrawer = ({setProcess, functionalityToEdit, setFunctionalityToEdit, openFunctionalityDrawer, setOpenFunctionalityDrawer}) => {
 
@@ -17,11 +16,6 @@ const FunctionalityDrawer = ({setProcess, functionalityToEdit, setFunctionalityT
         if (functionalityToEdit.functionality) {
             form.setFieldsValue({
                 name: functionalityToEdit.functionality.name || "",
-                requirements: functionalityToEdit.functionality.requirements?.map(r => ({
-                    content: r.content || "",
-                    type: r.type === 'Control factor' ? 'ControlFactor' : 'Functional' || "",
-                    id: r.id
-                })) || [],
             });
         } else {
             form.resetFields();
@@ -72,16 +66,15 @@ const FunctionalityDrawer = ({setProcess, functionalityToEdit, setFunctionalityT
     return(
         <Drawer
             title={functionalityToEdit.functionality ?
-                "Modifica funzione "+functionalityToEdit?.functionality.name :
-                "Crea nuova funzione"}
+                "Modifica funzione "+functionalityToEdit.functionality?.name :
+                "Crea nuova funzione per "+functionalityToEdit.component?.name}
             width={620}
-            closable={false}
             onClose={handleClose}
             open={openFunctionalityDrawer}
             extra={
                 <Space>
                     <Button onClick={handleClose}>Cancel</Button>
-                    <Button htmlType="submit" form="editFunctionForm" type="primary">
+                    <Button htmlType="submit" form="functionalityDrawerForm" variant="solid" color={'pink'}>
                         Submit
                     </Button>
                 </Space>
@@ -91,7 +84,7 @@ const FunctionalityDrawer = ({setProcess, functionalityToEdit, setFunctionalityT
                 form={form}
                 layout="vertical"
                 requiredMark={false}
-                id="editFunctionForm"
+                id="functionalityDrawerForm"
                 onFinish={(values) => {
                     functionalityToEdit.functionality ? editFunction(values) : createFunction(values);
                     handleClose()
@@ -102,70 +95,15 @@ const FunctionalityDrawer = ({setProcess, functionalityToEdit, setFunctionalityT
                         <Form.Item
                             name="name"
                             label="Nome"
+                            rules={[
+                                {
+                                    required: true,
+                                    whitespace: true,
+                                    message: "Inserisci il contenuto del requisito",
+                                },
+                            ]}
                         >
                             <Input placeholder="Nuovo nome della funzione" />
-                        </Form.Item>
-                        <Form.Item
-                            label="Requisiti"
-                            required={false}
-                        >
-                            <Form.List name="requirements">
-                                {(fields, { add, remove }) => (
-                                    <>
-                                        {fields.map(({ key, name}) => (
-                                            <Form.Item required={false} key={key}>
-                                                <Form.Item
-                                                    name={[name, 'content']}
-                                                    validateTrigger={['onChange', 'onBlur']}
-                                                    rules={[
-                                                        {
-                                                            required: true,
-                                                            whitespace: true,
-                                                            message: "Inserisci le informazioni del requisito",
-                                                        },
-                                                    ]}
-                                                    noStyle
-                                                >
-                                                    <Input
-                                                        placeholder="Contenuto del requisito"
-                                                        style={{ width: '55%' }}
-                                                    />
-                                                </Form.Item>
-                                                <Form.Item
-                                                    name={[name, 'type']}
-                                                    rules={[
-                                                        { required: true, message: 'Seleziona una tipologia' },
-                                                    ]}
-                                                    noStyle
-                                                >
-                                                    <Select
-                                                        placeholder="Tipologia di requisito"
-                                                        style={{ width: '30%', marginLeft: 5 }}
-                                                        options={[
-                                                            { value: 'ControlFactor', label: 'Control factor' },
-                                                            { value: 'Functional', label: 'Functional' },
-                                                        ]}
-                                                    />
-                                                </Form.Item>
-                                                <MinusCircleOutlined
-                                                    className="dynamic-delete-button"
-                                                    onClick={() => remove(name)}
-                                                />
-                                            </Form.Item>
-                                        ))}
-                                        <Form.Item>
-                                            <Button
-                                                type="dashed"
-                                                onClick={() => add()}
-                                                style={{ width: '100%' }}
-                                                icon={<PlusOutlined />}
-                                            >
-                                                Aggiungi requisito
-                                            </Button>
-                                        </Form.Item>
-                                    </>
-                                )}
-                            </Form.List>
                         </Form.Item>
                     </Col>
                 </Row>
