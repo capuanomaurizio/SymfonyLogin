@@ -12,6 +12,7 @@ export default function ProcessInfo({ processId }) {
 
     const [process, setProcess] = useState(null);
     const [page, setPage] = useState(0);
+    const [collapsedComponents, setCollapsedComponents] = useState([]);
 
     const [parentOfComponentToCreate, setParentOfComponentToCreate] = useState(null)
 
@@ -37,10 +38,6 @@ export default function ProcessInfo({ processId }) {
         fetchProcesses();
     }, []);
 
-    useEffect(() => {
-        console.log(requirementToEdit)
-    }, [requirementToEdit]);
-
     if (!process) {
         return <p>Caricamento dei dettagli del processo...</p>;
     }
@@ -50,12 +47,14 @@ export default function ProcessInfo({ processId }) {
         <StepsNavigator page={page} setPage={setPage} />
         {page === 0 ? (
             <ProcessDetails process={process} setProcess={setProcess} />
-        ) : (
+        ) : page === 1 ? (
             <>
                 <Components
                     process={process}
                     setProcess={setProcess}
                     setParentOfComponentToCreate={setParentOfComponentToCreate}
+                    collapsedComponents={collapsedComponents}
+                    setCollapsedComponents={setCollapsedComponents}
                     setComponentToEdit={setComponentToEdit}
                     setFunctionalityToEdit={setFunctionalityToEdit}
                     setOpenComponentDrawer={setOpenComponentDrawer}
@@ -85,6 +84,10 @@ export default function ProcessInfo({ processId }) {
                     openRequirementDrawer={openRequirementDrawer}
                     setOpenRequirementDrawer={setOpenRequirementDrawer}
                 />
+            </>
+        ) : (
+            <>
+
             </>
         )}
         </>

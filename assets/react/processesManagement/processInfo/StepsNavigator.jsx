@@ -16,6 +16,10 @@ const StepsNavigator = ({page, setPage}) => {
                     status: 'process',
                     title: 'Componenti processo',
                 },
+                {
+                    status: 'process',
+                    title: 'Triplette di funzioni',
+                },
             ]}
         />
     )

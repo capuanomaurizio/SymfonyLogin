@@ -16,7 +16,8 @@ function filterRoot(component, idToRemove) {
 }
 
 const Components = ({process, setProcess, setComponentToEdit, setOpenComponentDrawer, setParentOfComponentToCreate,
-                        setFunctionalityToEdit, setOpenFunctionalityDrawer, setRequirementToEdit, setOpenRequirementDrawer}) => {
+                        setFunctionalityToEdit, setOpenFunctionalityDrawer, setRequirementToEdit, setOpenRequirementDrawer,
+                        collapsedComponents, setCollapsedComponents}) => {
 
     const [showRequirements, setShowRequirements] = useState(true);
     const [showFunctionalities, setShowFunctionalities] = useState(true);
@@ -70,6 +71,8 @@ const Components = ({process, setProcess, setComponentToEdit, setOpenComponentDr
                     <Collapse
                         ghost
                         items={component.childrenComponents.map(transformComponent)}
+                        activeKey={collapsedComponents}
+                        onChange={(keys) => setCollapsedComponents(keys)}
                     />
                 )}
             </>
@@ -201,6 +204,8 @@ const Components = ({process, setProcess, setComponentToEdit, setOpenComponentDr
                     </Space>
             </div>
             <Collapse
+                activeKey={collapsedComponents}
+                onChange={(keys) => setCollapsedComponents(keys)}
                 items={treeData}
             />
         </ConfigProvider>
