@@ -1,5 +1,5 @@
 import {Dropdown, List, message, Space} from "antd";
-import {DeleteOutlined, DownOutlined, EditOutlined} from "@ant-design/icons";
+import {DeleteOutlined, EditOutlined, LoginOutlined} from "@ant-design/icons";
 import React from "react";
 import {apiRequest, updateRootEdit} from "../../../utils";
 
@@ -64,8 +64,7 @@ const Requirements = ({ setProcess, requirements, functionalityComponent, requir
             <Dropdown menu={{ items, onClick: handleMenuClick }}>
                 <a onClick={(e) => e.stopPropagation()}>
                     <Space style={{color: "rebeccapurple"}}>
-                        Requisito
-                        <DownOutlined style={{ fontSize: 10 }} />
+                        <LoginOutlined style={{ verticalAlign: 'middle' }} />
                     </Space>
                 </a>
             </Dropdown>
@@ -98,14 +97,7 @@ const Requirements = ({ setProcess, requirements, functionalityComponent, requir
                             border: "none",
                         }}
                     >
-                        <div
-                            style={{
-                                display: "flex",
-                                justifyContent: "space-between",
-                                alignItems: "center",
-                                width: "100%",
-                            }}
-                        >
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                             <span style={{ opacity: 0.85 }}>
                                 {req.content}{" "}<i style={{ color: "#888" }}>({req.requirementType})</i>
                             </span>

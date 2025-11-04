@@ -1,7 +1,7 @@
 import {Collapse, ConfigProvider, Dropdown, message, Space, Switch} from "antd";
 import React, {useState} from "react";
 import {apiRequest} from "../../../utils";
-import {DeleteOutlined, DownOutlined, EditOutlined, FileAddOutlined, FunctionOutlined, LoginOutlined} from "@ant-design/icons";
+import {DeleteOutlined, PlusCircleOutlined, EditOutlined, FileAddOutlined, FunctionOutlined, LoginOutlined} from "@ant-design/icons";
 import Functionalities from "./Functionalities";
 
 function findParentComponent(component, childId) {
@@ -75,9 +75,13 @@ const Components = ({process, setProcess, setComponentToEdit, setOpenComponentDr
 
         return {
             key: component.id,
-            label: component.name,
+            label: (
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <span>{component.name}</span>
+                    {componentOptions(component)}
+                </div>
+            ),
             children: childrenContent,
-            extra: componentOptions(component),
             collapsible: hasChildren || hasFunctionalities ? undefined : 'disabled',
             showArrow: hasChildren || hasFunctionalities ? undefined : false,
         };
@@ -126,8 +130,7 @@ const Components = ({process, setProcess, setComponentToEdit, setOpenComponentDr
             <Dropdown menu={{ items, onClick: handleMenuClick }}>
                 <a onClick={e => e.stopPropagation()}>
                     <Space>
-                        Componente
-                        <DownOutlined/>
+                        <PlusCircleOutlined style={{ verticalAlign: 'middle' }} />
                     </Space>
                 </a>
             </Dropdown>

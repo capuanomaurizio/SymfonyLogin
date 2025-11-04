@@ -1,6 +1,6 @@
 import {Dropdown, List, message, Space} from "antd";
 import Requirements from "./Requirements";
-import {DeleteOutlined, DownOutlined, EditOutlined, LoginOutlined} from "@ant-design/icons";
+import {DeleteOutlined, FunctionOutlined, EditOutlined, LoginOutlined} from "@ant-design/icons";
 import React from "react";
 import {apiRequest, updateRootEdit} from "../../../utils";
 
@@ -62,8 +62,7 @@ const Functionalities = ({functionalities, showRequirements, functionalityCompon
             <Dropdown menu={{ items, onClick: handleMenuClick }}>
                 <a onClick={e => e.stopPropagation()}>
                     <Space style={{ color: "deeppink" }}>
-                        Funzione
-                        <DownOutlined/>
+                        <FunctionOutlined style={{ verticalAlign: 'middle' }} />
                     </Space>
                 </a>
             </Dropdown>
@@ -91,14 +90,7 @@ const Functionalities = ({functionalities, showRequirements, functionalityCompon
                             alignItems: "flex-start",
                         }}
                     >
-                        <div
-                            style={{
-                                width: "100%",
-                                display: "flex",
-                                justifyContent: "space-between",
-                                alignItems: "center",
-                            }}
-                        >
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                             <span style={{ opacity: 0.85, fontWeight: 500 }}>{func.name}</span>
                             {functionalityOptions(func)}
                         </div>
