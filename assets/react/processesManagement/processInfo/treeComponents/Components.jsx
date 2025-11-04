@@ -101,7 +101,7 @@ const Components = ({process, setProcess, setComponentToEdit, setOpenComponentDr
 
     function componentOptions(component) {
         const items = [
-            {
+            !component.isRoot && {
                 key: 'edit',
                 label: 'Modifica componente',
                 icon: <EditOutlined />,
@@ -121,13 +121,11 @@ const Components = ({process, setProcess, setComponentToEdit, setOpenComponentDr
                 label: 'Nuova funzione',
                 icon: <FunctionOutlined />,
             },
-            component.isRoot ?
-                {
-                    key: 'addRootRequirement',
-                    label: 'Aggiungi requisito radice',
-                    icon: <LoginOutlined />,
-                }
-                : null
+            component.isRoot && {
+                key: 'addRootRequirement',
+                label: 'Aggiungi requisito radice',
+                icon: <LoginOutlined />,
+            }
         ];
         const handleMenuClick = ({ key, domEvent }) => {
             domEvent.stopPropagation();
@@ -196,7 +194,7 @@ const Components = ({process, setProcess, setComponentToEdit, setOpenComponentDr
                         <Switch
                             size="small"
                             checked={showFunctionalities}
-                            onChange={() => {setShowFunctionalities(!showFunctionalities); setShowRequirements(false)}}
+                            onChange={() => setShowFunctionalities(!showFunctionalities)}
                             style={{
                                 backgroundColor: showFunctionalities ? "deeppink" : "",
                             }}
@@ -206,7 +204,6 @@ const Components = ({process, setProcess, setComponentToEdit, setOpenComponentDr
                         <LoginOutlined style={{ color: "rebeccapurple" }} />
                         <span style={{ fontSize: 13, opacity: 0.85 }}>Visualizza requisiti delle funzioni</span>
                         <Switch
-                            disabled={!showFunctionalities}
                             size="small"
                             checked={showRequirements}
                             onChange={setShowRequirements}

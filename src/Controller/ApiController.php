@@ -118,6 +118,7 @@ class ApiController extends AbstractController
         $process->setName($values['name'])
             ->setContextInformation($values['contextInformation'])
             ->setExpirationDate(new \DateTime($values['expirationDate']));
+        $process->getComponent()->setName($values['name']);
         $this->documentManager->persist($process);
         $this->documentManager->flush();
         return $this->json($process);
