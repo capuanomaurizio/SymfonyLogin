@@ -13,7 +13,6 @@ export async function apiRequest(url, payload){
         return await response.json();
     } catch (err) {
         message.error('Errore nella ricezione dei dati');
-        console.error(err);
     }
 }
 
@@ -54,4 +53,14 @@ export function updateRootCreate(component, parentId, newComponent) {
             .filter(child => child !== null);
     }
     return component;
+}
+
+export function findParentComponent(component, childId) {
+    if (!component?.childrenComponents) return null;
+    for (const child of component.childrenComponents) {
+        if (child.id === childId) return component;
+        const found = findParentComponent(child, childId);
+        if (found) return found;
+    }
+    return null;
 }

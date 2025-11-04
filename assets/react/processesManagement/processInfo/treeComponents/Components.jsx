@@ -1,19 +1,9 @@
 import {Collapse, ConfigProvider, Dropdown, message, Space, Switch} from "antd";
 import React, {useState} from "react";
-import {apiRequest} from "../../../utils";
+import {apiRequest, findParentComponent} from "../../../utils";
 import {DeleteOutlined, PlusCircleOutlined, EditOutlined, FileAddOutlined, FunctionOutlined, LoginOutlined} from "@ant-design/icons";
 import Functionalities from "./Functionalities";
 import Requirements from "./Requirements";
-
-function findParentComponent(component, childId) {
-    if (!component?.childrenComponents) return null;
-    for (const child of component.childrenComponents) {
-        if (child.id === childId) return component;
-        const found = findParentComponent(child, childId);
-        if (found) return found;
-    }
-    return null;
-}
 
 function filterRoot(component, idToRemove) {
     if (component.id === idToRemove) return null;
