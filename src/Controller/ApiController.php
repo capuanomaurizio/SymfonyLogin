@@ -12,6 +12,7 @@ use App\Document\RootRequirement;
 use App\Document\FunctionalityRequirement;
 use App\Enum\FunctionalityRequirementType;
 use App\Enum\RootRequirementType;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\MongoDBException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -20,6 +21,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Serializer\SerializerInterface;
+use Throwable;
 
 class ApiController extends AbstractController
 {
@@ -86,14 +88,14 @@ class ApiController extends AbstractController
     }
 
     /**
-     * @throws \Throwable
+     * @throws Throwable
      * @throws MongoDBException
      */
     #[Route('/api/createProcess', methods: ['POST'])]
     public function createProcess(Request $request): Response
     {
         $data = json_decode($request->getContent(), true);
-        $rootComponent = (new Component())->setName($data['name']);
+        $rootComponent = (new Component())->setName($data['name'])->setIsRoot(true)->setRequirements(new ArrayCollection());
         $process = (new Process())->setName($data['name'])
             ->setComponent($rootComponent);
         $this->documentManager->persist($process);
@@ -105,7 +107,7 @@ class ApiController extends AbstractController
 
     /**
      * @throws MongoDBException
-     * @throws \Throwable
+     * @throws Throwable
      */
     #[Route('/api/editProcess', methods: ['POST'])]
     public function editProcess(Request $request): Response
@@ -116,18 +118,6 @@ class ApiController extends AbstractController
         $process->setName($values['name'])
             ->setContextInformation($values['contextInformation'])
             ->setExpirationDate(new \DateTime($values['expirationDate']));
-        if(isset($values['requirements'])){
-            foreach ($process->getRequirements() as $requirement){
-                $this->documentManager->remove($requirement);
-            }
-            $process->removeRequirements();
-            foreach ($values['requirements'] as $requirement) {
-                $process->addRequirement((new RootRequirement())
-                    ->setContent($requirement['content'])
-                    ->setRequirementType($requirement['type'] == 'NonFunctional' ?
-                        RootRequirementType::NON_FUNCTIONAL : RootRequirementType::UNINTENDED_OUTPUT));
-            }
-        }
         $this->documentManager->persist($process);
         $this->documentManager->flush();
         return $this->json($process);
@@ -245,6 +235,10 @@ class ApiController extends AbstractController
         return $this->json($requirement);
     }
 
+    /**
+     * @throws MongoDBException
+     * @throws Throwable
+     */
     #[Route('/api/deleteRequirement', methods: ['POST'])]
     public function deleteRequirement(Request $request): Response
     {
@@ -255,7 +249,49 @@ class ApiController extends AbstractController
         $this->documentManager->persist($function);
         $this->documentManager->remove($requirement);
         $this->documentManager->flush();
-        return $this->json($function);
+        return $this->json([]);
+    }
+
+    #[Route('/api/createRootRequirement', methods: ['POST'])]
+    public function createRootRequirement(Request $request): Response
+    {
+        $data = json_decode($request->getContent(), true);
+        $component = $this->documentManager->getRepository(Component::class)->findOneBy(['id' => $data['rootId']]);
+        $requirement = (new RootRequirement())
+            ->setContent($data['values']['content'])
+            ->setRequirementType($data['values']['type'] == 'NonFunctional' ?
+                RootRequirementType::NON_FUNCTIONAL : RootRequirementType::UNINTENDED_OUTPUT);
+        $component->addRequirement($requirement);
+        $this->documentManager->persist($component);
+        $this->documentManager->flush();
+        return $this->json($requirement);
+    }
+
+    #[Route('/api/editRootRequirement', methods: ['POST'])]
+    public function editRootRequirement(Request $request): Response
+    {
+        $data = json_decode($request->getContent(), true);
+        $values = $data['values'];
+        $requirement = $this->documentManager->getRepository(RootRequirement::class)->findOneBy(['id' => $data['requirementId']]);
+        $requirement->setContent($values['content'])
+            ->setRequirementType($values['type'] == 'NonFunctional' ?
+                RootRequirementType::NON_FUNCTIONAL : RootRequirementType::UNINTENDED_OUTPUT);
+        $this->documentManager->persist($requirement);
+        $this->documentManager->flush();
+        return $this->json($requirement);
+    }
+
+    #[Route('/api/deleteRootRequirement', methods: ['POST'])]
+    public function deleteRootRequirement(Request $request): Response
+    {
+        $data = $request->getPayload();
+        $component = $this->documentManager->getRepository(Component::class)->findOneBy(['id' => $data->get('rootId')]);
+        $requirement = $this->documentManager->getRepository(RootRequirement::class)->findOneBy(['id' => $data->get('requirementId')]);
+        $component->removeRequirement($requirement);
+        $this->documentManager->persist($component);
+        $this->documentManager->remove($requirement);
+        $this->documentManager->flush();
+        return $this->json([]);
     }
 
 }

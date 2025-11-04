@@ -14,10 +14,16 @@ const FunctionalityDrawer = ({setProcess, requirementToEdit, setRequirementToEdi
 
     useEffect(() => {
         if (requirementToEdit.requirement) {
-            form.setFieldsValue({
-                content: requirementToEdit.requirement.content || "",
-                type: requirementToEdit.requirement.requirementType === 'Control factor' ? 'ControlFactor' : 'Functional' || "",
-            });
+            if (requirementToEdit.functionality)
+                form.setFieldsValue({
+                    content: requirementToEdit.requirement.content || "",
+                    type: requirementToEdit.requirement.requirementType === 'Functional' ? 'Functional' : 'Control factor' || "",
+                });
+            else
+                form.setFieldsValue({
+                    content: requirementToEdit.requirement.content || "",
+                    type: requirementToEdit.requirement.requirementType === 'NonFunctional' ? 'Non functional' : 'Unintended output' || "",
+                });
         } else {
             form.resetFields();
         }
@@ -43,11 +49,10 @@ const FunctionalityDrawer = ({setProcess, requirementToEdit, setRequirementToEdi
                 ...prev,
                 component: updateRootEdit(prev.component, requirementToEdit.component.id, updatedComponent)
             }));
-            message.success("Funzionalità aggiunta al componente!");
+            message.success("Requisito aggiunto alla funzione!");
         }
         catch (e) {
-            console.error(e)
-            message.error("Funzionalità non aggiunta al componente")
+            message.error("Funzionalità non aggiunto alla funzione")
         }
     }
 
@@ -76,16 +81,58 @@ const FunctionalityDrawer = ({setProcess, requirementToEdit, setRequirementToEdi
             message.success("Requisito della funzione aggiornato!");
         }
         catch (e) {
-            console.error(e)
             message.error("Requisito della funzione non aggiornato")
+        }
+    }
+
+    async function editRootRequirement(values){
+        try {
+            const editedRequirement = await apiRequest('editRootRequirement',
+                {'requirementId': requirementToEdit.requirement.id, 'values': values});
+            const updatedComponent = {
+                ...requirementToEdit.component,
+                requirements: requirementToEdit.component.requirements.map(r =>
+                    r.id === requirementToEdit.requirement.id ? editedRequirement : r
+                ),
+            };
+            setProcess(prev => ({
+                ...prev,
+                component: updateRootEdit(prev.component, requirementToEdit.component.id, updatedComponent)
+            }));
+            message.success("Requisito del componente radice aggiornato!");
+        }
+        catch (e) {
+            message.error("Requisito del componente radice non aggiornato")
+        }
+    }
+
+    async function createRootRequirement(values) {
+        try {
+            const newRequirement = await apiRequest('createRootRequirement',
+                {'rootId': requirementToEdit.component.id, 'values': values});
+            const updatedComponent = {
+                ...requirementToEdit.component,
+                requirements: [...(requirementToEdit.component.requirements || []), newRequirement]
+            };
+            setProcess(prev => ({
+                ...prev,
+                component: updateRootEdit(prev.component, requirementToEdit.component.id, updatedComponent)
+            }));
+            message.success("Requisito aggiunto al componente radice!");
+        }
+        catch (e) {
+            message.error("Requisito non aggiunto al componente radice")
         }
     }
 
     return(
         <Drawer
             title={requirementToEdit?.requirement ?
-                "Modifica requisito "+requirementToEdit.requirement?.id :
-                "Crea nuovo requisito per "+requirementToEdit.functionality?.name}
+                    "Modifica requisito "+requirementToEdit.requirement?.id :
+                    requirementToEdit?.functionality ?
+                        "Crea nuovo requisito per "+requirementToEdit.functionality?.name :
+                        "Crea nuovo requisito per la radice "+requirementToEdit.component?.name
+            }
             width={620}
             onClose={handleClose}
             open={openRequirementDrawer}
@@ -103,7 +150,9 @@ const FunctionalityDrawer = ({setProcess, requirementToEdit, setRequirementToEdi
                 labelWrap
                 id="requirementDrawerForm"
                 onFinish={(values) => {
-                    requirementToEdit.requirement ? editRequirement(values) : createRequirement(values);
+                    requirementToEdit.functionality
+                        ? requirementToEdit.requirement ? editRequirement(values) : createRequirement(values)
+                        : requirementToEdit.requirement ? editRootRequirement(values) : createRootRequirement(values)
                     handleClose()
                 }}
             >
@@ -134,10 +183,17 @@ const FunctionalityDrawer = ({setProcess, requirementToEdit, setRequirementToEdi
                 >
                     <Select
                         placeholder="Tipologia di requisito"
-                        options={[
-                            { value: 'ControlFactor', label: 'Control factor' },
-                            { value: 'Functional', label: 'Functional' },
-                        ]}
+                        options={
+                            requirementToEdit?.functionality
+                                ? [
+                                    { value: 'ControlFactor', label: 'Control factor' },
+                                    { value: 'Functional', label: 'Functional' },
+                                ]
+                                : [
+                                    { value: 'UnintendedOutput', label: 'Unintended output' },
+                                    { value: 'NonFunctional', label: 'Non functional' },
+                                ]
+                        }
                     />
                 </Form.Item>
             </Form>

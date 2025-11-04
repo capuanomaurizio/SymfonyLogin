@@ -35,14 +35,9 @@ class Process
     #[Groups(['process:read'])]
     private ?Component $component;
 
-    #[ODM\ReferenceMany(storeAs: 'dbRef', targetDocument: RootRequirement::class, cascade: ['persist', 'remove'])]
-    #[Groups(['process:read'])]
-    private Collection $requirements;
-
     public function __construct()
     {
         $this->creationDate = new \DateTime();
-        $this->requirements = new ArrayCollection();
     }
 
     public function getId(): ?string
@@ -103,25 +98,6 @@ class Process
     public function setComponent(?Component $main_component): Process
     {
         $this->component = $main_component;
-        return $this;
-    }
-
-    public function getRequirements(): Collection
-    {
-        return $this->requirements;
-    }
-
-    public function addRequirement(RootRequirement $requirement): Process
-    {
-        if(!$this->requirements->contains($requirement)){
-            $this->requirements->add($requirement);
-        }
-        return $this;
-    }
-
-    public function removeRequirements(): Process
-    {
-        $this->requirements = new ArrayCollection();
         return $this;
     }
 

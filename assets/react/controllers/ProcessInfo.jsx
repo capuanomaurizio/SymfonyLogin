@@ -37,6 +37,10 @@ export default function ProcessInfo({ processId }) {
         fetchProcesses();
     }, []);
 
+    useEffect(() => {
+        console.log(requirementToEdit)
+    }, [requirementToEdit]);
+
     if (!process) {
         return <p>Caricamento dei dettagli del processo...</p>;
     }

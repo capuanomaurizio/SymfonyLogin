@@ -3,6 +3,6 @@ namespace App\Enum;
 
 enum RootRequirementType: string {
     case UNINTENDED_OUTPUT = 'Unintended output';
-    case NON_FUNCTIONAL = 'Non-functional';
+    case NON_FUNCTIONAL = 'Non functional';
 
 }

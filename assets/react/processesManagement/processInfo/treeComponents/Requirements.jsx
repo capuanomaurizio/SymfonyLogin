@@ -4,7 +4,7 @@ import React from "react";
 import {apiRequest, updateRootEdit} from "../../../utils";
 
 const Requirements = ({ setProcess, requirements, functionalityComponent, requirementFunctionality,
-                          setRequirementToEdit, setOpenRequirementDrawer }) => {
+                          setRequirementToEdit, setOpenRequirementDrawer, rootComponent }) => {
 
     async function deleteRequirement(requirementId) {
         try {
@@ -27,8 +27,25 @@ const Requirements = ({ setProcess, requirements, functionalityComponent, requir
             }));
             message.success("Requisito rimosso dalla funzionalità!");
         } catch (e) {
-            console.error(e)
             message.error("Requisito non rimosso dalla funzionalità");
+        }
+    }
+
+    async function deleteRootRequirement(requirementId) {
+        try {
+            await apiRequest('deleteRootRequirement', {rootId: rootComponent.id, requirementId});
+            const updatedComponent = {
+                ...rootComponent,
+                requirements: rootComponent.requirements.filter(req => req.id !== requirementId),
+            };
+            setProcess(prev => ({
+                ...prev,
+                component: updateRootEdit(prev.component, rootComponent.id, updatedComponent),
+            }));
+            message.success("Requisito rimosso dal componente radice!");
+        } catch (e) {
+            console.error(e)
+            message.error("Requisito non rimosso dal componente radice");
         }
     }
 
@@ -49,14 +66,23 @@ const Requirements = ({ setProcess, requirements, functionalityComponent, requir
         const handleMenuClick = ({ key, domEvent }) => {
             domEvent.stopPropagation();
             if (key === 'edit') {
+                if(rootComponent){
+                    setRequirementToEdit({
+                        'component': rootComponent,
+                        'functionality': null,
+                        'requirement': requirement
+                    })
+                } else {
+                    setRequirementToEdit({
+                        'component': functionalityComponent,
+                        'functionality': requirementFunctionality,
+                        'requirement': requirement
+                    })
+                }
                 setOpenRequirementDrawer(true);
-                setRequirementToEdit({
-                    'component': functionalityComponent,
-                    'functionality': requirementFunctionality,
-                    'requirement': requirement
-                })
             } else if (key === 'delete') {
-                deleteRequirement(requirement.id)
+                if(rootComponent) deleteRootRequirement(requirement.id);
+                else deleteRequirement(requirement.id);
             }
         };
 

@@ -18,6 +18,10 @@ class Component
     #[Groups(['process:read'])]
     private string $name;
 
+    #[ODM\Field(type: 'boolean')]
+    #[Groups(['process:read'])]
+    private bool $isRoot = false;
+
     #[ODM\ReferenceMany(storeAs: 'dbRef', targetDocument: Component::class, cascade: ['persist', 'remove'])]
     #[Groups(['process:read'])]
     private Collection $childrenComponents;
@@ -25,6 +29,10 @@ class Component
     #[ODM\ReferenceMany(storeAs: 'dbRef', targetDocument: Functionality::class, cascade: ['persist', 'remove'])]
     #[Groups(['process:read'])]
     private Collection $functionalities;
+
+    #[ODM\ReferenceMany(storeAs: 'dbRef', targetDocument: RootRequirement::class, cascade: ['persist', 'remove'])]
+    #[Groups(['process:read'])]
+    private ?Collection $requirements = null;
 
     public function __construct()
     {
@@ -50,6 +58,17 @@ class Component
     public function setName(string $name): Component
     {
         $this->name = $name;
+        return $this;
+    }
+
+    public function isRoot(): bool
+    {
+        return $this->isRoot;
+    }
+
+    public function setIsRoot(bool $isRoot): Component
+    {
+        $this->isRoot = $isRoot;
         return $this;
     }
 
@@ -86,6 +105,37 @@ class Component
     public function removeFunctionality(Functionality $functionality): Component
     {
         $this->functionalities->removeElement($functionality);
+        return $this;
+    }
+
+    public function getRequirements(): ?Collection
+    {
+        return $this->requirements;
+    }
+
+    public function setRequirements(?Collection $requirements): Component
+    {
+        $this->requirements = $requirements;
+        return $this;
+    }
+
+    public function addRequirement(RootRequirement $requirement): Component
+    {
+        if(!$this->requirements->contains($requirement)){
+            $this->requirements->add($requirement);
+        }
+        return $this;
+    }
+
+    public function removeRequirement(RootRequirement $requirement): Component
+    {
+        $this->requirements->removeElement($requirement);
+        return $this;
+    }
+
+    public function removeRequirements(): Component
+    {
+        $this->requirements = new ArrayCollection();
         return $this;
     }
 

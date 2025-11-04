@@ -3,6 +3,7 @@ import React, {useState} from "react";
 import {apiRequest} from "../../../utils";
 import {DeleteOutlined, PlusCircleOutlined, EditOutlined, FileAddOutlined, FunctionOutlined, LoginOutlined} from "@ant-design/icons";
 import Functionalities from "./Functionalities";
+import Requirements from "./Requirements";
 
 function findParentComponent(component, childId) {
     if (!component?.childrenComponents) return null;
@@ -48,6 +49,7 @@ const Components = ({process, setProcess, setComponentToEdit, setOpenComponentDr
     const transformComponent = (component) => {
         const hasChildren = component.childrenComponents?.length > 0;
         const hasFunctionalities = component.functionalities?.length > 0;
+        const hasRequirements = component.isRoot && component.requirements?.length > 0;
 
         const functionalitiesList = hasFunctionalities && showFunctionalities ? (
             <Functionalities
@@ -59,10 +61,20 @@ const Components = ({process, setProcess, setComponentToEdit, setOpenComponentDr
                 setOpenFunctionalityDrawer={setOpenFunctionalityDrawer}
                 setRequirementToEdit={setRequirementToEdit}
                 setOpenRequirementDrawer={setOpenRequirementDrawer}
-            ></Functionalities> ) : null;
+            /> ) : null;
+
+        const requirementsList = hasRequirements && showRequirements ? (
+            <Requirements
+                setProcess={setProcess}
+                requirements={component.requirements}
+                rootComponent={component}
+                setRequirementToEdit={setRequirementToEdit}
+                setOpenRequirementDrawer={setOpenRequirementDrawer}
+            /> ) : null
 
         const childrenContent = (
             <>
+                {requirementsList}
                 {functionalitiesList}
                 {hasChildren && (
                     <Collapse
@@ -109,6 +121,13 @@ const Components = ({process, setProcess, setComponentToEdit, setOpenComponentDr
                 label: 'Nuova funzione',
                 icon: <FunctionOutlined />,
             },
+            component.isRoot ?
+                {
+                    key: 'addRootRequirement',
+                    label: 'Aggiungi requisito radice',
+                    icon: <LoginOutlined />,
+                }
+                : null
         ];
         const handleMenuClick = ({ key, domEvent }) => {
             domEvent.stopPropagation();
@@ -123,6 +142,9 @@ const Components = ({process, setProcess, setComponentToEdit, setOpenComponentDr
             } else if (key === 'addFunctionality') {
                 setFunctionalityToEdit({'component': component, 'functionality': null});
                 setOpenFunctionalityDrawer(true);
+            } else if (key === 'addRootRequirement') {
+                setRequirementToEdit({'component': component, 'functionality': null, 'requirement': null})
+                setOpenRequirementDrawer(true);
             }
         };
 
