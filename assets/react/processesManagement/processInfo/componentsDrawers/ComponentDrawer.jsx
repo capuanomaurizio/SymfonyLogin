@@ -1,4 +1,4 @@
-import {Button, Col, Drawer, Form, Input, Row, Space, message} from "antd";
+import {Button, Drawer, Form, Input, Space, message} from "antd";
 import {apiRequest, updateRootEdit, updateRootCreate} from "../../../utils";
 import React, {useEffect} from "react";
 
@@ -63,24 +63,22 @@ const ComponentDrawer = ({componentToEdit, setComponentToEdit, openComponentDraw
         >
             <Form
                 form={form}
-                layout="vertical" requiredMark={false}
+                labelWrap
                 id="componentDrawerForm"
                 onFinish={(values) => {
                     componentToEdit ? editComponent(values) : createComponent(values);
                     handleClose();
                 }}
             >
-                <Row gutter={16}>
-                    <Col span={12}>
-                        <Form.Item
-                            name="name"
-                            label="Nome"
-                            rules={[{ required: true, message: 'Non lasciare il campo vuoto' }]}
-                        >
-                            <Input placeholder="Nuovo nome del componente" />
-                        </Form.Item>
-                    </Col>
-                </Row>
+                <Form.Item
+                    labelCol={{ span: 6 }}
+                    wrapperCol={{ span: 14 }}
+                    name="name"
+                    label="Nome"
+                    rules={[{ required: true, message: 'Non lasciare il campo vuoto' }]}
+                >
+                    <Input placeholder="Nuovo nome del componente" />
+                </Form.Item>
             </Form>
         </Drawer>
     )

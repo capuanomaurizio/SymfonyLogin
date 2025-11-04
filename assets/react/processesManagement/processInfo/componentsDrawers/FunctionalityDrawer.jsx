@@ -1,4 +1,4 @@
-import {Button, Col, Drawer, Form, Input, message, Row, Space} from "antd";
+import {Button, Drawer, Form, Input, message, Space} from "antd";
 import React, {useEffect} from "react";
 import {apiRequest, updateRootEdit} from "../../../utils";
 
@@ -82,31 +82,28 @@ const FunctionalityDrawer = ({setProcess, functionalityToEdit, setFunctionalityT
         >
             <Form
                 form={form}
-                layout="vertical"
-                requiredMark={false}
+                labelWrap
                 id="functionalityDrawerForm"
                 onFinish={(values) => {
                     functionalityToEdit.functionality ? editFunction(values) : createFunction(values);
                     handleClose()
                 }}
             >
-                <Row gutter={16}>
-                    <Col span={18}>
-                        <Form.Item
-                            name="name"
-                            label="Nome"
-                            rules={[
-                                {
-                                    required: true,
-                                    whitespace: true,
-                                    message: "Inserisci il contenuto del requisito",
-                                },
-                            ]}
-                        >
-                            <Input placeholder="Nuovo nome della funzione" />
-                        </Form.Item>
-                    </Col>
-                </Row>
+                <Form.Item
+                    labelCol={{ span: 6 }}
+                    wrapperCol={{ span: 14 }}
+                    name="name"
+                    label="Nome"
+                    rules={[
+                        {
+                            required: true,
+                            whitespace: true,
+                            message: "Inserisci il contenuto del requisito",
+                        },
+                    ]}
+                >
+                    <Input placeholder="Nuovo nome della funzione" />
+                </Form.Item>
             </Form>
         </Drawer>
     )

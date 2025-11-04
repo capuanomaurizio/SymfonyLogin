@@ -161,7 +161,6 @@ const FunctionalityDrawer = ({setProcess, requirementToEdit, setRequirementToEdi
                     wrapperCol={{ span: 14 }}
                     label={'Contenuto: '}
                     name='content'
-                    validateTrigger={['onChange', 'onBlur']}
                     rules={[
                         {
                             required: true,
