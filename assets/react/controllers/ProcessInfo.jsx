@@ -6,18 +6,22 @@ import ProcessDetails from "../processesManagement/processInfo/ProcessDetails"
 import ComponentDrawer from "../processesManagement/processInfo/componentsDrawers/ComponentDrawer";
 import Components from "../processesManagement/processInfo/treeComponents/Components";
 import FunctionalityDrawer from "../processesManagement/processInfo/componentsDrawers/FunctionalityDrawer";
+import RequirementDrawer from "../processesManagement/processInfo/componentsDrawers/RequirementDrawer";
 
 export default function ProcessInfo({ processId }) {
 
     const [process, setProcess] = useState(null);
     const [page, setPage] = useState(0);
 
+    const [parentOfComponentToCreate, setParentOfComponentToCreate] = useState(null)
+
     const [componentToEdit, setComponentToEdit] = useState(null)
     const [functionalityToEdit, setFunctionalityToEdit] = useState({'component': null, 'functionality': null})
-    const [parentOfComponentToCreate, setParentOfComponentToCreate] = useState(null)
+    const [requirementToEdit, setRequirementToEdit] = useState({'component': null, 'functionality': null, 'requirement': null})
 
     const [openComponentDrawer, setOpenComponentDrawer] = useState(false);
     const [openFunctionalityDrawer, setOpenFunctionalityDrawer] = useState(false);
+    const [openRequirementDrawer, setOpenRequirementDrawer] = useState(false);
 
     const fetchProcesses = () => {
         apiRequest('processesList')
@@ -47,19 +51,21 @@ export default function ProcessInfo({ processId }) {
                 <Components
                     process={process}
                     setProcess={setProcess}
-                    setComponentToEdit={setComponentToEdit}
-                    setOpenComponentDrawer={setOpenComponentDrawer}
                     setParentOfComponentToCreate={setParentOfComponentToCreate}
+                    setComponentToEdit={setComponentToEdit}
                     setFunctionalityToEdit={setFunctionalityToEdit}
+                    setOpenComponentDrawer={setOpenComponentDrawer}
                     setOpenFunctionalityDrawer={setOpenFunctionalityDrawer}
+                    setRequirementToEdit={setRequirementToEdit}
+                    setOpenRequirementDrawer={setOpenRequirementDrawer}
                 />
                 <ComponentDrawer
+                    setProcess={setProcess}
+                    parentOfComponentToCreate={parentOfComponentToCreate}
                     componentToEdit={componentToEdit}
                     setComponentToEdit={setComponentToEdit}
                     openComponentDrawer={openComponentDrawer}
                     setOpenComponentDrawer={setOpenComponentDrawer}
-                    parentOfComponentToCreate={parentOfComponentToCreate}
-                    setProcess={setProcess}
                 />
                 <FunctionalityDrawer
                     setProcess={setProcess}
@@ -67,6 +73,13 @@ export default function ProcessInfo({ processId }) {
                     setFunctionalityToEdit={setFunctionalityToEdit}
                     openFunctionalityDrawer={openFunctionalityDrawer}
                     setOpenFunctionalityDrawer={setOpenFunctionalityDrawer}
+                />
+                <RequirementDrawer
+                    setProcess={setProcess}
+                    requirementToEdit={requirementToEdit}
+                    setRequirementToEdit={setRequirementToEdit}
+                    openRequirementDrawer={openRequirementDrawer}
+                    setOpenRequirementDrawer={setOpenRequirementDrawer}
                 />
             </>
         )}

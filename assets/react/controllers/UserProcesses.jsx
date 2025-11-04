@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {apiRequest} from "../utils";
-import NewProcessForm from "../processesManagement/userProcesses/NewProcessForm";
 import ProcessesList from "../processesManagement/userProcesses/ProcessesList";
+import ProcessDrawer from "../processesManagement/userProcesses/ProcessDrawer";
 
 const transformProcesses = (processes) =>
     processes.map((process) => ({
@@ -28,7 +28,7 @@ export default function UserProcesses() {
 
     const [components, setComponents] = useState(null);
     const [processes, setProcesses] = useState(null);
-    const [hidden, setHidden] = useState(true);
+    const [openProcessDrawer, setOpenProcessDrawer] = useState(false);
 
     const fetchProcesses = () => {
         apiRequest('processesList')
@@ -56,8 +56,8 @@ export default function UserProcesses() {
 
     return (
         <>
-            <ProcessesList processes={processes} setProcesses={setProcesses} setHidden={setHidden}></ProcessesList>
-            <NewProcessForm isHidden={hidden} setHidden={setHidden} components={components}></NewProcessForm>
+            <ProcessesList processes={processes} setProcesses={setProcesses} setOpenProcessDrawer={setOpenProcessDrawer} />
+            <ProcessDrawer openProcessDrawer={openProcessDrawer} setOpenProcessDrawer={setOpenProcessDrawer} components={components} />
         </>
     );
 }

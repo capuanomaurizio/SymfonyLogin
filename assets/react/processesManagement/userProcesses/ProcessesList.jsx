@@ -3,7 +3,7 @@ import {DeleteOutlined, EditOutlined, FileAddOutlined} from "@ant-design/icons";
 import React from "react";
 import {apiRequest} from "../../utils";
 
-const ProcessesList = ({processes, setProcesses, setHidden}) => {
+const ProcessesList = ({processes, setProcesses, setOpenProcessDrawer}) => {
 
     async function deleteProcess(id){
         try {
@@ -22,7 +22,7 @@ const ProcessesList = ({processes, setProcesses, setHidden}) => {
             title="Lista dei processi dell'utente"
             style={{ marginBottom: '1rem' }}
             extra={
-                <Button variant="solid" color="green" onClick={() => {setHidden(false)}}>
+                <Button variant="solid" color="green" onClick={() => {setOpenProcessDrawer(true)}}>
                     Nuovo processo
                     <FileAddOutlined />
                 </Button>
