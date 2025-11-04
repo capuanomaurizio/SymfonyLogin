@@ -22,6 +22,10 @@ class Component
     #[Groups(['process:read'])]
     private bool $isRoot = false;
 
+    #[ODM\Field(type: 'integer')]
+    #[Groups(['process:read'])]
+    private int $depth;
+
     #[ODM\ReferenceMany(storeAs: 'dbRef', targetDocument: Component::class, cascade: ['persist', 'remove'])]
     #[Groups(['process:read'])]
     private Collection $childrenComponents;
@@ -69,6 +73,17 @@ class Component
     public function setIsRoot(bool $isRoot): Component
     {
         $this->isRoot = $isRoot;
+        return $this;
+    }
+
+    public function getDepth(): int
+    {
+        return $this->depth;
+    }
+
+    public function setDepth(int $depth): Component
+    {
+        $this->depth = $depth;
         return $this;
     }
 

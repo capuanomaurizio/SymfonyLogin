@@ -95,8 +95,13 @@ class ApiController extends AbstractController
     public function createProcess(Request $request): Response
     {
         $data = json_decode($request->getContent(), true);
-        $rootComponent = (new Component())->setName($data['name'])->setIsRoot(true)->setRequirements(new ArrayCollection());
-        $process = (new Process())->setName($data['name'])
+        $rootComponent = (new Component())
+            ->setName($data['name'])
+            ->setIsRoot(true)
+            ->setRequirements(new ArrayCollection())
+            ->setDepth(0);
+        $process = (new Process())
+            ->setName($data['name'])
             ->setComponent($rootComponent);
         $this->documentManager->persist($process);
         $this->documentManager->flush();
@@ -139,7 +144,9 @@ class ApiController extends AbstractController
     {
         $data = $request->getPayload();
         $parentComponent = $this->documentManager->getRepository(Component::class)->findOneBy(['id' => $data->get('parentId')]);
-        $component = (new Component())->setName($data->get('name'));
+        $component = (new Component())
+            ->setName($data->get('name'))
+            ->setDepth($parentComponent->getDepth() + 1);
         $parentComponent->addChildComponent($component);
         $this->documentManager->persist($parentComponent);
         $this->documentManager->flush();
@@ -275,8 +282,8 @@ class ApiController extends AbstractController
         $values = $data['values'];
         $requirement = $this->documentManager->getRepository(RootRequirement::class)->findOneBy(['id' => $data['requirementId']]);
         $requirement->setContent($values['content'])
-            ->setRequirementType($values['type'] == 'NonFunctional' ?
-                RootRequirementType::NON_FUNCTIONAL : RootRequirementType::UNINTENDED_OUTPUT);
+                    ->setRequirementType($values['type'] == 'NonFunctional' ?
+                        RootRequirementType::NON_FUNCTIONAL : RootRequirementType::UNINTENDED_OUTPUT);
         $this->documentManager->persist($requirement);
         $this->documentManager->flush();
         return $this->json($requirement);
