@@ -13,6 +13,10 @@ body{
     background-color: #fff !important;
 }
 
-.ant-collapse-item .ant-collapse-content {
-    border-top: none;
+/*.ant-collapse-item .ant-collapse-content {*/
+/*    border-top: none;*/
+/*}*/
+
+.ant-collapse-content-box {
+    padding-top: 0 !important;
 }
