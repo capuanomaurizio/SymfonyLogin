@@ -1,5 +1,5 @@
 import {apiRequest} from "../../utils";
-import {Button, Card, Col, DatePicker, Form, Input, message, Row, Switch} from "antd";
+import {Button, Card, DatePicker, Form, Input, message, Space, Switch} from "antd";
 import React, {useState} from "react";
 import {EditOutlined} from "@ant-design/icons";
 import dayjs from "dayjs";
@@ -23,16 +23,24 @@ const ProcessDetails = ({ process, setProcess }) => {
 
     return (
         <Card title={"Processo "+process.name} style={{ minHeight: '35vh' }}
-              extra={
-                  <Switch
-                      checkedChildren={<EditOutlined />}
-                      unCheckedChildren={<EditOutlined />}
-                      checked={enabledForm}
-                      onChange={() => setEnabledForm(!enabledForm)}
-                  />
-              }>
+            extra={
+                <Space size="middle">
+                    {enabledForm && (
+                        <Button variant="solid" form="editProcessForm" color="green" htmlType="submit">
+                            Modifica processo
+                        </Button>
+                    )}
+                    <Switch
+                        checkedChildren={<EditOutlined />}
+                        unCheckedChildren={<EditOutlined />}
+                        checked={enabledForm}
+                        onChange={() => setEnabledForm(!enabledForm)}
+                    />
+                </Space>
+            }>
             <Form
                 form={form}
+                name="editProcessForm"
                 disabled={!enabledForm}
                 labelWrap
                 initialValues={{
@@ -47,41 +55,32 @@ const ProcessDetails = ({ process, setProcess }) => {
                 }}
                 onFinish={(values) => {editProcess(values); setEnabledForm(false)}}
             >
-                <Row gutter={16}>
-                    <Col span={12}>
-                        <Form.Item
-                            label="Nome processo"
-                            name="name"
-                            labelCol={{ span: 8 }}
-                            wrapperCol={{ span: 14 }}
-                            rules={[{ required: true, message: "Non lasciare vuoto il campo" }]}
-                        >
-                            <Input />
-                        </Form.Item>
-                        <Form.Item
-                            label="Informazioni di contesto"
-                            name="contextInformation"
-                            labelCol={{ span: 8 }}
-                            wrapperCol={{ span: 14 }}
-                            rules={[{ required: true, message: "Non lasciare vuoto il campo" }]}
-                        >
-                            <Input.TextArea />
-                        </Form.Item>
-                        <Form.Item
-                            label="Prospetto termine"
-                            name="expirationDate"
-                            labelCol={{ span: 8 }}
-                            wrapperCol={{ span: 14 }}
-                            rules={[{ required: true, message: "Non lasciare vuoto il campo" }]}
-                        >
-                            <DatePicker></DatePicker>
-                        </Form.Item>
-                    </Col>
-                </Row>
-                <Form.Item label={null} hidden={!enabledForm}>
-                    <Button block variant="outlined" color="green" htmlType="submit">
-                        Modifica processo
-                    </Button>
+                <Form.Item
+                    label="Nome processo"
+                    name="name"
+                    labelCol={{ span: 6 }}
+                    wrapperCol={{ span: 14 }}
+                    rules={[{ required: true, message: "Non lasciare vuoto il campo" }]}
+                >
+                    <Input />
+                </Form.Item>
+                <Form.Item
+                    label="Informazioni di contesto"
+                    name="contextInformation"
+                    labelCol={{ span: 6 }}
+                    wrapperCol={{ span: 14 }}
+                    rules={[{ required: true, message: "Non lasciare vuoto il campo" }]}
+                >
+                    <Input.TextArea />
+                </Form.Item>
+                <Form.Item
+                    label="Prospetto termine"
+                    name="expirationDate"
+                    labelCol={{ span: 6 }}
+                    wrapperCol={{ span: 14 }}
+                    rules={[{ required: true, message: "Non lasciare vuoto il campo" }]}
+                >
+                    <DatePicker></DatePicker>
                 </Form.Item>
             </Form>
         </Card>
