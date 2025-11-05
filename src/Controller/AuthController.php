@@ -39,12 +39,12 @@ class AuthController extends AbstractController
                     'message' => 'Utente creato correttamente',
                     'user' => $security->getUser()->getUserIdentifier(),
                     'redirect' => $this->generateUrl('homepage')
-                ], 201);
+                ], Response::HTTP_CREATED);
             }
             else
-                return $this->json(['error' => 'Utente già registrato'], 401);
+                return $this->json(['error' => 'Utente già registrato'], Response::HTTP_UNAUTHORIZED);
         } catch (\Exception $e) {
-            return $this->json(['error' => 'Errore nella creazione dell account: ' . $e->getMessage()], 400);
+            return $this->json(['error' => 'Errore nella creazione dell account: ' . $e->getMessage()], Response::HTTP_BAD_REQUEST);
         }
     }
 
