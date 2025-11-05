@@ -132,7 +132,7 @@ const ListBox = ({ title, prefix, items, selectedId, onSelect, selectedNextId, e
                                                     marginTop: 10,
                                                 }}
                                             >
-                                                <span
+                                                {r.tag && <span
                                                     style={{
                                                         display: "inline-flex",
                                                         alignItems: "center",
@@ -146,11 +146,11 @@ const ListBox = ({ title, prefix, items, selectedId, onSelect, selectedNextId, e
                                                         fontWeight: "bold",
                                                         lineHeight: "18px",
                                                         userSelect: "none",
-                                                        transform: "translate(-85%, -60%)",
+                                                        transform: "translate(-85%, -65%)",
                                                     }}
                                                 >
                                                     {r.tag}
-                                                </span>
+                                                </span>}
                                             </div>
                                         </ArcherElement>
                                     ))}
