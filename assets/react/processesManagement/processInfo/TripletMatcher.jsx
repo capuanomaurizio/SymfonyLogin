@@ -5,8 +5,6 @@ import "antd/dist/reset.css";
 import { apiRequest } from "../../utils";
 import { BranchesOutlined, ReloadOutlined } from "@ant-design/icons";
 
-const selectColor = "#000000";
-
 // palette di colori ciclica
 const tripletColors = [
     "#E6194B", "#3CB44B", "#0082C8", "#F58231",
@@ -14,17 +12,7 @@ const tripletColors = [
     "#008080", "#AA6E28", "#800000", "#808000",
 ];
 
-const ListBox = ({ title, prefix, items, selectedId, onSelect, color, selectedNextId, existingTriplets, onScrollRefresh }) => {
-
-    const connectedIds = useMemo(() => {
-        const ids = new Set();
-        existingTriplets.forEach(t => {
-            if (prefix === "a" && t.f1) ids.add(t.f1.id);
-            if (prefix === "b" && t.f2) ids.add(t.f2.id);
-            if (prefix === "c" && t.f3) ids.add(t.f3.id);
-        });
-        return ids;
-    }, [existingTriplets, prefix]);
+const ListBox = ({ title, prefix, items, selectedId, onSelect, selectedNextId, existingTriplets, onScrollRefresh }) => {
 
     // Genera una mappa ID → colore, memorizzata con useMemo
     const tripletColorMap = useMemo(() => {
@@ -42,7 +30,7 @@ const ListBox = ({ title, prefix, items, selectedId, onSelect, color, selectedNe
         triplets.forEach((t) => {
             const { f1, f2, f3 } = t;
             const tripletId = t.id ?? `${f1.id}-${f2.id}-${f3.id}`;
-            const {color: tripletColor, label: tripletLabel} = colorMap.get(tripletId) || {color: "#999", label: "?"};
+            const {color: tripletColor, label: tripletLabel} = colorMap.get(tripletId);
 
             if (prefix === "a" && f1?.id === id && f2) {
                 const key = `a-${f1.id}-b-${f2.id}`;
@@ -70,6 +58,8 @@ const ListBox = ({ title, prefix, items, selectedId, onSelect, color, selectedNe
         return rels;
     }
 
+    const baseColor = "#000000";
+
     return (
         <Card
             title={title}
@@ -80,7 +70,6 @@ const ListBox = ({ title, prefix, items, selectedId, onSelect, color, selectedNe
                 dataSource={items}
                 renderItem={(item) => {
                     const isSelected = selectedId === item.id;
-                    const isConnected = connectedIds.has(item.id);
                     let relations = [];
                     if (isSelected && selectedNextId) {
                         const nextPrefix = prefix === "a" ? "b" : prefix === "b" ? "c" : null;
@@ -90,7 +79,7 @@ const ListBox = ({ title, prefix, items, selectedId, onSelect, color, selectedNe
                                 targetId: `${nextPrefix}-${selectedNextId}`,
                                 sourceAnchor: "right",
                                 targetAnchor: "left",
-                                style: { strokeColor: color, strokeWidth: 5, strokeDasharray: "6,4", },
+                                style: { strokeColor: baseColor, strokeWidth: 5, strokeDasharray: "6,4", },
                             });
                         }
                     }
@@ -105,12 +94,8 @@ const ListBox = ({ title, prefix, items, selectedId, onSelect, color, selectedNe
                             style={{
                                 cursor: "pointer",
                                 padding: "8px 12px",
-                                background: isSelected ? `${color}20` : isConnected ? `${color}10` : undefined,
-                                borderLeft: isSelected
-                                    ? `4px solid ${color}`
-                                    : isConnected
-                                        ? `4px solid ${color}80`
-                                        : "4px solid transparent",
+                                background: isSelected ? `${baseColor}20` : `${baseColor}10`,
+                                borderLeft: isSelected ? `4px solid ${baseColor}` : `4px solid ${baseColor}80`,
                                 transition: "all 0.15s ease",
                             }}
                         >
@@ -260,7 +245,6 @@ export default function TripletMatcher({ functionalities, processId, componentId
                             items={functionalities[0] || []}
                             selectedId={selectedA}
                             onSelect={(id) => setSelectedA(id)}
-                            color={selectColor}
                             selectedNextId={selectedB}
                             existingTriplets={existingTriplets}
                             onScrollRefresh={() => archerRef.current?.refreshScreen()}
@@ -273,7 +257,6 @@ export default function TripletMatcher({ functionalities, processId, componentId
                             items={functionalities[1] || []}
                             selectedId={selectedB}
                             onSelect={(id) => setSelectedB(id)}
-                            color={selectColor}
                             selectedNextId={selectedC}
                             existingTriplets={existingTriplets}
                             onScrollRefresh={() => archerRef.current?.refreshScreen()}
@@ -286,7 +269,6 @@ export default function TripletMatcher({ functionalities, processId, componentId
                             items={functionalities[2] || []}
                             selectedId={selectedC}
                             onSelect={(id) => setSelectedC(id)}
-                            color={selectColor}
                             selectedNextId={null}
                             existingTriplets={existingTriplets}
                             onScrollRefresh={() => archerRef.current?.refreshScreen()}
