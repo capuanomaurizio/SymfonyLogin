@@ -324,5 +324,19 @@ class ApiController extends AbstractController
         }
     }
 
+    #[Route('/api/getComponentTriplets', methods: ['POST'])]
+    public function getComponentTriplets(Request $request): Response
+    {
+        $data = $request->getPayload();
+        $component = $this->documentManager->getRepository(Component::class)->findOneBy(['id' => $data->get('componentId')]);
+        $functionalities = $component->getFunctionalities();
+        $allComponentTriplets = [];
+        foreach ($functionalities as $functionality) {
+            $triplets = $this->documentManager->getRepository(Triplet::class)->findBy(['f2' => $functionality]);
+            $allComponentTriplets = array_merge($allComponentTriplets, $triplets);
+        }
+        return $this->json($allComponentTriplets);
+    }
+
 }
 

@@ -25,7 +25,7 @@ function filterRoot(component, idToRemove) {
 
 const Components = ({process, setProcess, setComponentToEdit, setOpenComponentDrawer, setParentOfComponentToCreate,
                         setFunctionalityToEdit, setOpenFunctionalityDrawer, setRequirementToEdit, setOpenRequirementDrawer,
-                        collapsedComponents, setCollapsedComponents, setPage, setFunctionalities}) => {
+                        collapsedComponents, setCollapsedComponents, setPage, setFunctionalities, setComponentForTriplet}) => {
 
     const [showRequirements, setShowRequirements] = useState(true);
     const [showFunctionalities, setShowFunctionalities] = useState(true);
@@ -154,6 +154,7 @@ const Components = ({process, setProcess, setComponentToEdit, setOpenComponentDr
                 const parentFuncs = findParentComponent(process.component, component.id)?.functionalities || [];
                 const funcs = component.functionalities || [];
                 const childrenFuncs = getDescendantFunctionalities(component);
+                setComponentForTriplet(component);
                 setFunctionalities([parentFuncs, funcs, childrenFuncs]);
             }
         };

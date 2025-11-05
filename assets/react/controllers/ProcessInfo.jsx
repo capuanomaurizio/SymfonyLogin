@@ -14,6 +14,8 @@ export default function ProcessInfo({ processId }) {
 
     const [process, setProcess] = useState(null);
     const [functionalities, setFunctionalities] = useState([[],[],[]]);
+    const [componentForTriplet, setComponentForTriplet] = useState(null);
+
     const [page, setPage] = useState(0);
     const [collapsedComponents, setCollapsedComponents] = useState([]);
 
@@ -66,6 +68,7 @@ export default function ProcessInfo({ processId }) {
                     setOpenRequirementDrawer={setOpenRequirementDrawer}
                     setPage={setPage}
                     setFunctionalities={setFunctionalities}
+                    setComponentForTriplet={setComponentForTriplet}
                 />
                 <ComponentDrawer
                     setProcess={setProcess}
@@ -91,7 +94,7 @@ export default function ProcessInfo({ processId }) {
                 />
             </>
         ) : (
-            <TripletMatcher functionalities={functionalities} processId={process.id}/>
+            <TripletMatcher functionalities={functionalities} processId={process.id} componentId={componentForTriplet.id}/>
         )}
         </>
     );
