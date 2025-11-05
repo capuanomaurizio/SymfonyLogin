@@ -7,10 +7,13 @@ import ComponentDrawer from "../processesManagement/processInfo/componentsDrawer
 import Components from "../processesManagement/processInfo/treeComponents/Components";
 import FunctionalityDrawer from "../processesManagement/processInfo/componentsDrawers/FunctionalityDrawer";
 import RequirementDrawer from "../processesManagement/processInfo/componentsDrawers/RequirementDrawer";
+import TripletMatcher from "../processesManagement/processInfo/TripletMatcher";
+
 
 export default function ProcessInfo({ processId }) {
 
     const [process, setProcess] = useState(null);
+    const [functionalities, setFunctionalities] = useState([[],[],[]]);
     const [page, setPage] = useState(0);
     const [collapsedComponents, setCollapsedComponents] = useState([]);
 
@@ -61,6 +64,8 @@ export default function ProcessInfo({ processId }) {
                     setOpenFunctionalityDrawer={setOpenFunctionalityDrawer}
                     setRequirementToEdit={setRequirementToEdit}
                     setOpenRequirementDrawer={setOpenRequirementDrawer}
+                    setPage={setPage}
+                    setFunctionalities={setFunctionalities}
                 />
                 <ComponentDrawer
                     setProcess={setProcess}
@@ -86,9 +91,7 @@ export default function ProcessInfo({ processId }) {
                 />
             </>
         ) : (
-            <>
-
-            </>
+            <TripletMatcher functionalities={functionalities} processId={process.id}/>
         )}
         </>
     );

@@ -1,7 +1,15 @@
 import {Collapse, ConfigProvider, Dropdown, message, Space, Switch} from "antd";
 import React, {useState} from "react";
-import {apiRequest, findParentComponent} from "../../../utils";
-import {DeleteOutlined, PlusCircleOutlined, EditOutlined, FileAddOutlined, FunctionOutlined, LoginOutlined} from "@ant-design/icons";
+import {apiRequest, findParentComponent, getDescendantFunctionalities} from "../../../utils";
+import {
+    DeleteOutlined,
+    PlusCircleOutlined,
+    EditOutlined,
+    FileAddOutlined,
+    FunctionOutlined,
+    LoginOutlined,
+    BranchesOutlined
+} from "@ant-design/icons";
 import Functionalities from "./Functionalities";
 import Requirements from "./Requirements";
 
@@ -17,7 +25,7 @@ function filterRoot(component, idToRemove) {
 
 const Components = ({process, setProcess, setComponentToEdit, setOpenComponentDrawer, setParentOfComponentToCreate,
                         setFunctionalityToEdit, setOpenFunctionalityDrawer, setRequirementToEdit, setOpenRequirementDrawer,
-                        collapsedComponents, setCollapsedComponents}) => {
+                        collapsedComponents, setCollapsedComponents, setPage, setFunctionalities}) => {
 
     const [showRequirements, setShowRequirements] = useState(true);
     const [showFunctionalities, setShowFunctionalities] = useState(true);
@@ -118,7 +126,12 @@ const Components = ({process, setProcess, setComponentToEdit, setOpenComponentDr
                 key: 'addRootRequirement',
                 label: 'Aggiungi requisito radice',
                 icon: <LoginOutlined />,
-            }
+            },
+            {
+                key: 'expandTriplet',
+                label: 'Esporta funzioni',
+                icon: <BranchesOutlined />,
+            },
         ];
         const handleMenuClick = ({ key, domEvent }) => {
             domEvent.stopPropagation();
@@ -136,6 +149,12 @@ const Components = ({process, setProcess, setComponentToEdit, setOpenComponentDr
             } else if (key === 'addRootRequirement') {
                 setRequirementToEdit({'component': component, 'functionality': null, 'requirement': null})
                 setOpenRequirementDrawer(true);
+            } else if (key === 'expandTriplet') {
+                setPage(3);
+                const parentFuncs = findParentComponent(process.component, component.id)?.functionalities || [];
+                const funcs = component.functionalities || [];
+                const childrenFuncs = getDescendantFunctionalities(component);
+                setFunctionalities([parentFuncs, funcs, childrenFuncs]);
             }
         };
 

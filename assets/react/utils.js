@@ -64,3 +64,22 @@ export function findParentComponent(component, childId) {
     }
     return null;
 }
+
+export function getDescendantFunctionalities(component) {
+    if (!component.childrenComponents || component.childrenComponents.length === 0) {
+        return [];
+    }
+    return component.childrenComponents.flatMap(child => [
+        ...(child.functionalities || []),
+        ...getDescendantFunctionalities(child)
+    ]);
+}
+
+export function getAllFunctionalities(component) {
+    const ownFuncs = component.functionalities || [];
+    if (!component.childrenComponents || component.childrenComponents.length === 0) {
+        return ownFuncs;
+    }
+    const childFuncs = component.childrenComponents.flatMap(child => getAllFunctionalities(child));
+    return [...ownFuncs, ...childFuncs];
+}

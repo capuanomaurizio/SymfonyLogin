@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Document\Component;
 use App\Document\Functionality;
 use App\Document\Process;
+use App\Document\Triplet;
 use App\Document\User;
 use App\Document\RootRequirement;
 use App\Document\FunctionalityRequirement;
@@ -300,6 +301,27 @@ class ApiController extends AbstractController
         $this->documentManager->remove($requirement);
         $this->documentManager->flush();
         return $this->json([]);
+    }
+
+    #[Route('/api/checkIfTripletIsValid', methods: ['POST'])]
+    public function checkIfTripletIsValid(Request $request): Response
+    {
+        $data = json_decode($request->getContent(), true);
+        $f1 = $this->documentManager->getRepository(Functionality::class)->findOneBy(['id' => $data['selectedA']]);
+        $f2 = $this->documentManager->getRepository(Functionality::class)->findOneBy(['id' => $data['selectedB']]);
+        $f3 = $this->documentManager->getRepository(Functionality::class)->findOneBy(['id' => $data['selectedC']]);
+        $triplet = $this->documentManager->getRepository(Triplet::class)->findBy(['f1' => $f1, 'f2' => $f2, 'f3' => $f3]);
+        if(empty($triplet)){
+            $triplet = (new Triplet())->setF1($f1)->setF2($f2)->setF3($f3);
+            $process = $this->documentManager->getRepository(Process::class)->findOneBy(['id' => $data['processId']]);
+            $process->addTriplet($triplet);
+            $this->documentManager->persist($process);
+            $this->documentManager->flush();
+            return $this->json([$triplet], Response::HTTP_OK);
+        }
+        else{
+            return $this->json([], Response::HTTP_CONFLICT);
+        }
     }
 
 }

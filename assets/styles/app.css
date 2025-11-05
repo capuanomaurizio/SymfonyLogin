@@ -20,3 +20,9 @@ body{
 .ant-collapse-content-box {
     padding-top: 0 !important;
 }
+
+.archer-container > svg {
+    z-index: 50 !important;
+    position: relative;
+    pointer-events: none; /* non intralcia i click */
+}

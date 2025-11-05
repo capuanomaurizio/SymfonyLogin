@@ -33,11 +33,16 @@ class Process
 
     #[ODM\ReferenceOne(storeAs: 'dbRef', targetDocument: Component::class, cascade: ['persist', 'remove'])]
     #[Groups(['process:read'])]
-    private ?Component $component;
+    private Component $component;
+
+    #[ODM\ReferenceMany(storeAs: 'dbRef', targetDocument: Triplet::class, cascade: ['persist', 'remove'])]
+    #[Groups(['process:read'])]
+    private Collection $triplets;
 
     public function __construct()
     {
         $this->creationDate = new \DateTime();
+        $this->triplets = new ArrayCollection();
     }
 
     public function getId(): ?string
@@ -89,15 +94,33 @@ class Process
         return $this;
     }
 
-
-    public function getComponent(): ?Component
+    public function getComponent(): Component
     {
         return $this->component;
     }
 
-    public function setComponent(?Component $main_component): Process
+    public function setComponent(?Component $rootComponent): Process
     {
-        $this->component = $main_component;
+        $this->component = $rootComponent;
+        return $this;
+    }
+
+    public function getTriplets(): Collection
+    {
+        return $this->triplets;
+    }
+
+    public function addTriplet(Triplet $triplet): Process
+    {
+        if(!$this->triplets->contains($triplet)){
+            $this->triplets->add($triplet);
+        }
+        return $this;
+    }
+
+    public function removeTriplet(Triplet $triplet): Process
+    {
+        $this->triplets->removeElement($triplet);
         return $this;
     }
 

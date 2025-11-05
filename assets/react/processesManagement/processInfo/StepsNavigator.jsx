@@ -19,6 +19,7 @@ const StepsNavigator = ({page, setPage}) => {
                 {
                     status: 'process',
                     title: 'Triplette di funzioni',
+                    disabled: true
                 },
             ]}
         />
