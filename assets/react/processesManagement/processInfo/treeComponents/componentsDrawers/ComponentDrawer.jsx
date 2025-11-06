@@ -14,10 +14,6 @@ const ComponentDrawer = ({componentToEdit, setComponentToEdit, openComponentDraw
     }
 
     useEffect(() => {
-        console.log(componentToEdit)
-    }, [componentToEdit]);
-
-    useEffect(() => {
         if (componentToEdit) {
             form.setFieldsValue({
                 name: componentToEdit.name,

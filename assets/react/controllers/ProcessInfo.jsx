@@ -68,7 +68,6 @@ export default function ProcessInfo({ processId }) {
                     setOpenFunctionalityDrawer={setOpenFunctionalityDrawer}
                     setRequirementToEdit={setRequirementToEdit}
                     setOpenRequirementDrawer={setOpenRequirementDrawer}
-                    setPage={setPage}
                     setFunctionalities={setFunctionalities}
                     setSelectedComponent={setSelectedComponent}
                     setComponents={setComponents}

@@ -30,7 +30,7 @@ function filterRoot(component, idToRemove) {
 
 const Components = ({process, setProcess, setComponentToEdit, setOpenComponentDrawer, setParentOfComponentToCreate,
                     setFunctionalityToEdit, setOpenFunctionalityDrawer, setRequirementToEdit, setOpenRequirementDrawer,
-                    collapsedComponents, setCollapsedComponents, setPage, setFunctionalities, setSelectedComponent, setComponents}) => {
+                    collapsedComponents, setCollapsedComponents, setFunctionalities, setSelectedComponent, setComponents}) => {
 
     const [showRequirements, setShowRequirements] = useState(true);
     const [showFunctionalities, setShowFunctionalities] = useState(true);
@@ -122,20 +122,20 @@ const Components = ({process, setProcess, setComponentToEdit, setOpenComponentDr
                 label: 'Elimina componente',
                 icon: <DeleteOutlined />,
             },
-            {
+            !component.isFeature && {
                 key: 'addFunctionality',
                 label: 'Nuova funzione',
                 icon: <FunctionOutlined />,
+            },
+            !component.isFeature && {
+                key: 'focusComponent',
+                label: 'Focus su componente',
+                icon: <AimOutlined />,
             },
             component.isRoot && {
                 key: 'addRootRequirement',
                 label: 'Aggiungi requisito radice',
                 icon: <LoginOutlined />,
-            },
-            {
-                key: 'expandTriplet',
-                label: 'Focus su componente',
-                icon: <AimOutlined />,
             },
         ];
         const handleMenuClick = ({ key, domEvent }) => {
@@ -154,8 +154,7 @@ const Components = ({process, setProcess, setComponentToEdit, setOpenComponentDr
             } else if (key === 'addRootRequirement') {
                 setRequirementToEdit({'component': component, 'functionality': null, 'requirement': null})
                 setOpenRequirementDrawer(true);
-            } else if (key === 'expandTriplet') {
-                setPage(2);
+            } else if (key === 'focusComponent') {
                 const parentFuncs = findParentComponent(process.component, component.id)?.functionalities || [];
                 const funcs = component.functionalities || [];
                 const childrenFuncs = getDescendantFunctionalities(component);

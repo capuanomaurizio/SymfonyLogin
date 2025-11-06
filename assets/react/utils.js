@@ -86,8 +86,8 @@ export function getComponentAndRelatives(targetComponent, rootComponent) {
         return null;
     }
     const parent = findParent(rootComponent);
-    const siblings = parent?.childrenComponents?.filter(c => c.id !== targetComponent.id) || [];
-    const children = targetComponent.childrenComponents || [];
+    const siblings = parent?.childrenComponents?.filter(c => c.id !== targetComponent.id).filter(c => !c.isFeature) || [];
+    const children = targetComponent.childrenComponents.filter(c => !c.isFeature) || [];
     return [targetComponent, ...siblings, ...children];
 }
 
