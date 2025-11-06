@@ -99,8 +99,7 @@ class ApiController extends AbstractController
         $rootComponent = (new Component())
             ->setName($data['name'])
             ->setIsRoot(true)
-            ->setRequirements(new ArrayCollection())
-            ->setDepth(0);
+            ->setRequirements(new ArrayCollection());
         $process = (new Process())
             ->setName($data['name'])
             ->setComponent($rootComponent);
@@ -143,11 +142,13 @@ class ApiController extends AbstractController
     #[Route('/api/createComponent', methods: ['POST'])]
     public function createComponent(Request $request): Response
     {
-        $data = $request->getPayload();
-        $parentComponent = $this->documentManager->getRepository(Component::class)->findOneBy(['id' => $data->get('parentId')]);
+        $data = json_decode($request->getContent(), true);
+        $parentComponent = $this->documentManager->getRepository(Component::class)->findOneBy(['id' => $data['parentId']]);
+        if($parentComponent->isFeature())
+            $parentComponent->setIsFeature(false);
         $component = (new Component())
-            ->setName($data->get('name'))
-            ->setDepth($parentComponent->getDepth() + 1);
+            ->setName($data['values']['name'])
+            ->setIsFeature($data['values']['isFeature']);
         $parentComponent->addChildComponent($component);
         $this->documentManager->persist($parentComponent);
         $this->documentManager->flush();
@@ -157,9 +158,11 @@ class ApiController extends AbstractController
     #[Route('/api/editComponent', methods: ['POST'])]
     public function editComponent(Request $request): Response
     {
-        $data = $request->getPayload();
-        $component = $this->documentManager->getRepository(Component::class)->findOneBy(['id' => $data->get('id')]);
-        $component->setName($data->get('newName'));
+        $data = json_decode($request->getContent(), true);
+        $component = $this->documentManager->getRepository(Component::class)->findOneBy(['id' => $data['id']]);
+        $component->setName($data['values']['name']);
+        if(isset($data['values']['isFeature']))
+            $component->setIsFeature($data['values']['isFeature']);
         $this->documentManager->persist($component);
         $this->documentManager->flush();
         return $this->json([]);

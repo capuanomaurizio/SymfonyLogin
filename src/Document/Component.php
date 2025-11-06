@@ -22,9 +22,9 @@ class Component
     #[Groups(['process:read'])]
     private bool $isRoot = false;
 
-    #[ODM\Field(type: 'integer')]
+    #[ODM\Field(type: 'boolean')]
     #[Groups(['process:read'])]
-    private int $depth;
+    private bool $isFeature;
 
     #[ODM\ReferenceMany(storeAs: 'dbRef', targetDocument: Component::class, cascade: ['persist', 'remove'])]
     #[Groups(['process:read'])]
@@ -76,14 +76,14 @@ class Component
         return $this;
     }
 
-    public function getDepth(): int
+    public function isFeature(): bool
     {
-        return $this->depth;
+        return $this->isFeature;
     }
 
-    public function setDepth(int $depth): Component
+    public function setIsFeature(bool $isFeature): Component
     {
-        $this->depth = $depth;
+        $this->isFeature = $isFeature;
         return $this;
     }
 

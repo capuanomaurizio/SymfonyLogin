@@ -1,4 +1,4 @@
-import {Button, Drawer, Form, Input, Space, message} from "antd";
+import {Button, Drawer, Form, Input, Space, message, Switch} from "antd";
 import {apiRequest, updateRootEdit, updateRootCreate} from "../../../../utils";
 import React, {useEffect} from "react";
 
@@ -14,9 +14,14 @@ const ComponentDrawer = ({componentToEdit, setComponentToEdit, openComponentDraw
     }
 
     useEffect(() => {
+        console.log(componentToEdit)
+    }, [componentToEdit]);
+
+    useEffect(() => {
         if (componentToEdit) {
             form.setFieldsValue({
                 name: componentToEdit.name,
+                isFeature: componentToEdit.isFeature,
             });
         } else {
             form.resetFields();
@@ -24,7 +29,9 @@ const ComponentDrawer = ({componentToEdit, setComponentToEdit, openComponentDraw
     }, [componentToEdit, form]);
 
     async function createComponent(values) {
-        const newComponent = await apiRequest('createComponent', {'parentId': parentOfComponentToCreate.id, 'name': values.name});
+        const newComponent = await apiRequest('createComponent', {parentId: parentOfComponentToCreate.id, values});
+        if(parentOfComponentToCreate?.isFeature)
+            parentOfComponentToCreate.isFeature = false;
         setProcess(prev => ({
             ...prev,
             component: updateRootCreate(prev.component, parentOfComponentToCreate.id, newComponent)
@@ -34,7 +41,7 @@ const ComponentDrawer = ({componentToEdit, setComponentToEdit, openComponentDraw
 
     async function editComponent(values) {
         try{
-            await apiRequest('editComponent', {'id': componentToEdit.id, 'newName': values.name});
+            await apiRequest('editComponent', {id: componentToEdit.id, values});
             setProcess(prev => ({
                 ...prev,
                 component: updateRootEdit(prev.component, componentToEdit.id, values)
@@ -69,6 +76,7 @@ const ComponentDrawer = ({componentToEdit, setComponentToEdit, openComponentDraw
                     componentToEdit ? editComponent(values) : createComponent(values);
                     handleClose();
                 }}
+                initialValues={{isFeature: true}}
             >
                 <Form.Item
                     labelCol={{ span: 6 }}
@@ -79,6 +87,16 @@ const ComponentDrawer = ({componentToEdit, setComponentToEdit, openComponentDraw
                 >
                     <Input placeholder="Nuovo nome del componente" />
                 </Form.Item>
+                {(componentToEdit?.isFeature || !componentToEdit) && <Form.Item
+                        labelCol={{ span: 6 }}
+                        wrapperCol={{ span: 14 }}
+                        name="isFeature"
+                        label="Caratteristica"
+                        valuePropName="checked"
+                    >
+                        <Switch defaultChecked/>
+                    </Form.Item>
+                }
             </Form>
         </Drawer>
     )
