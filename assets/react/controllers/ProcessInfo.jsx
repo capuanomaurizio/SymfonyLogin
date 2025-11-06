@@ -2,12 +2,12 @@ import {message} from "antd";
 import React, {useEffect, useState} from 'react';
 import {apiRequest} from "../utils";
 import StepsNavigator from "../processesManagement/processInfo/StepsNavigator";
-import ProcessDetails from "../processesManagement/processInfo/ProcessDetails"
-import ComponentDrawer from "../processesManagement/processInfo/componentsDrawers/ComponentDrawer";
+import ProcessDetails from "../processesManagement/processInfo/details/ProcessDetails"
+import ComponentDrawer from "../processesManagement/processInfo/treeComponents/componentsDrawers/ComponentDrawer";
 import Components from "../processesManagement/processInfo/treeComponents/Components";
-import FunctionalityDrawer from "../processesManagement/processInfo/componentsDrawers/FunctionalityDrawer";
-import RequirementDrawer from "../processesManagement/processInfo/componentsDrawers/RequirementDrawer";
-import TripletMatcher from "../processesManagement/processInfo/TripletMatcher";
+import FunctionalityDrawer from "../processesManagement/processInfo/treeComponents/componentsDrawers/FunctionalityDrawer";
+import RequirementDrawer from "../processesManagement/processInfo/treeComponents/componentsDrawers/RequirementDrawer";
+import TripletMatcher from "../processesManagement/processInfo/triplets/TripletMatcher";
 
 
 export default function ProcessInfo({ processId }) {
@@ -93,8 +93,10 @@ export default function ProcessInfo({ processId }) {
                     setOpenRequirementDrawer={setOpenRequirementDrawer}
                 />
             </>
-        ) : (
+        ) : page === 2 ? (
             <TripletMatcher functionalities={functionalities} processId={process.id} componentId={componentIdForTriplet}/>
+        ) : (
+            <></>
         )}
         </>
     );

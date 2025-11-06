@@ -1,6 +1,6 @@
 import {Button, Drawer, Form, Input, message, Select, Space} from "antd";
 import React, {useEffect} from "react";
-import {apiRequest, updateRootEdit} from "../../../utils";
+import {apiRequest, updateRootEdit} from "../../../../utils";
 
 const FunctionalityDrawer = ({setProcess, requirementToEdit, setRequirementToEdit, openRequirementDrawer, setOpenRequirementDrawer}) => {
 

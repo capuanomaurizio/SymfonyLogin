@@ -20,6 +20,10 @@ const StepsNavigator = ({page, setPage}) => {
                     status: 'process',
                     title: 'Triplette di funzioni',
                 },
+                {
+                    status: 'process',
+                    title: 'Matrice dei componenti',
+                },
             ]}
         />
     )

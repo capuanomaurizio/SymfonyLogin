@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useState} from "react";
 import { Row, Col, Button, message } from "antd";
 import { ArcherContainer } from "react-archer";
 import "antd/dist/reset.css";
-import { apiRequest } from "../../utils";
+import { apiRequest } from "../../../utils";
 import { BranchesOutlined, ReloadOutlined } from "@ant-design/icons";
 import FunctionalitiesList from "./FunctionalitiesList";
 
@@ -97,7 +97,7 @@ export default function TripletMatcher({ functionalities, processId, componentId
                     </Col>
                     <Col span={7}>
                         <FunctionalitiesList
-                            title={"Funzioni del componente esaminato"}
+                            title={componentId ? "Funzioni di "+componentId : "Componente non selezionato"}
                             prefix="b"
                             items={functionalities[1] || []}
                             selectedId={selectedB}
