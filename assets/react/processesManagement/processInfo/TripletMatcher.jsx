@@ -11,6 +11,7 @@ export default function TripletMatcher({ functionalities, processId, componentId
     const [selectedB, setSelectedB] = useState(null);
     const [selectedC, setSelectedC] = useState(null);
     const [existingTriplets, setExistingTriplets] = useState([]);
+    const [hoveredTriplet, setHoveredTriplet] = useState(null);
     const archerRef = useRef(null);
 
     useEffect(() => {
@@ -34,13 +35,13 @@ export default function TripletMatcher({ functionalities, processId, componentId
                     ...prev,
                     { f1: { id: selectedA }, f2: { id: selectedB }, f3: { id: selectedC } },
                 ]);
-                setSelectedA(null);
-                setSelectedB(null);
-                setSelectedC(null);
                 message.success("Tripletta di funzioni correttamente registrata");
             } else {
                 message.error("Tripletta di funzioni non registrata. Esiste già una istanza");
             }
+            setSelectedA(null);
+            setSelectedB(null);
+            setSelectedC(null);
         } catch (e) {
             console.error(e);
         }
@@ -89,6 +90,8 @@ export default function TripletMatcher({ functionalities, processId, componentId
                             selectedNextId={selectedB}
                             existingTriplets={existingTriplets}
                             onScrollRefresh={() => archerRef.current?.refreshScreen()}
+                            hoveredTriplet={hoveredTriplet}
+                            setHoveredTriplet={setHoveredTriplet}
                         />
                     </Col>
                     <Col span={7}>
@@ -101,6 +104,8 @@ export default function TripletMatcher({ functionalities, processId, componentId
                             selectedNextId={selectedC}
                             existingTriplets={existingTriplets}
                             onScrollRefresh={() => archerRef.current?.refreshScreen()}
+                            hoveredTriplet={hoveredTriplet}
+                            setHoveredTriplet={setHoveredTriplet}
                         />
                     </Col>
                     <Col span={7}>
@@ -113,6 +118,8 @@ export default function TripletMatcher({ functionalities, processId, componentId
                             selectedNextId={null}
                             existingTriplets={existingTriplets}
                             onScrollRefresh={() => archerRef.current?.refreshScreen()}
+                            hoveredTriplet={hoveredTriplet}
+                            setHoveredTriplet={setHoveredTriplet}
                         />
                     </Col>
                 </Row>

@@ -2,7 +2,8 @@ import {useMemo} from "react";
 import {Card, List} from "antd";
 import {ArcherElement} from "react-archer";
 
-const FunctionalitiesList = ({ title, prefix, items, selectedId, onSelect, selectedNextId, existingTriplets, onScrollRefresh }) => {
+const FunctionalitiesList = ({ title, prefix, items, selectedId, onSelect, selectedNextId, existingTriplets,
+                                 onScrollRefresh, hoveredTriplet, setHoveredTriplet }) => {
 
     const tripletColors = [
         "#E6194B", "#3CB44B", "#0082C8", "#F58231",
@@ -10,7 +11,13 @@ const FunctionalitiesList = ({ title, prefix, items, selectedId, onSelect, selec
         "#008080", "#AA6E28", "#800000", "#808000",
     ];
 
-    // Genera una mappa ID → colore, memorizzata con useMemo
+    function hexToRgba(hex, alpha = 1) {
+        const match = hex.match(/^#([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i);
+        if (!match) return hex;
+        const [, r, g, b] = match;
+        return `rgba(${parseInt(r,16)}, ${parseInt(g,16)}, ${parseInt(b,16)}, ${alpha})`;
+    }
+
     const tripletColorMap = useMemo(() => {
         const map = new Map();
         existingTriplets.forEach((t, index) => {
@@ -28,6 +35,8 @@ const FunctionalitiesList = ({ title, prefix, items, selectedId, onSelect, selec
             const tripletId = t.id ?? `${f1.id}-${f2.id}-${f3.id}`;
             const {color: tripletColor, label: tripletLabel} = colorMap.get(tripletId);
 
+            const colorWithOpacity = hexToRgba(tripletColor, hoveredTriplet && hoveredTriplet === tripletLabel ? 1 : 0.5);
+
             if (prefix === "a" && f1?.id === id && f2) {
                 const key = `a-${f1.id}-b-${f2.id}`;
                 rels.push({
@@ -35,7 +44,7 @@ const FunctionalitiesList = ({ title, prefix, items, selectedId, onSelect, selec
                     targetId: `b-${f2.id}`,
                     sourceAnchor: "right",
                     targetAnchor: "left",
-                    style: { strokeColor: tripletColor, strokeWidth: 2.5 },
+                    style: { strokeColor: colorWithOpacity, strokeWidth: 2.5 },
                     tag: tripletLabel,
                 });
             }
@@ -46,7 +55,7 @@ const FunctionalitiesList = ({ title, prefix, items, selectedId, onSelect, selec
                     targetId: `c-${f3.id}`,
                     sourceAnchor: "right",
                     targetAnchor: "left",
-                    style: { strokeColor: tripletColor, strokeWidth: 2.5 },
+                    style: { strokeColor: colorWithOpacity, strokeWidth: 2.5 },
                     tag: tripletLabel,
                 });
             }
@@ -75,12 +84,12 @@ const FunctionalitiesList = ({ title, prefix, items, selectedId, onSelect, selec
                                 targetId: `${nextPrefix}-${selectedNextId}`,
                                 sourceAnchor: "right",
                                 targetAnchor: "left",
-                                style: { strokeColor: baseColor, strokeWidth: 5, strokeDasharray: "6,4", },
+                                style: { strokeColor: baseColor, strokeWidth: 4, strokeDasharray: "6,4", },
                             });
                         }
                     }
                     const allRelations = [
-                        ...generateRelationsForItem(prefix, item.id, existingTriplets, tripletColorMap),
+                        ...generateRelationsForItem(prefix, item.id, existingTriplets, tripletColorMap, hoveredTriplet),
                         ...relations,
                     ];
 
@@ -129,6 +138,8 @@ const FunctionalitiesList = ({ title, prefix, items, selectedId, onSelect, selec
                                                     }}
                                                 >
                                                     {r.tag && <span
+                                                        onMouseEnter={() => setHoveredTriplet(r.tag)}
+                                                        onMouseLeave={() => setHoveredTriplet(null)}
                                                         style={{
                                                             display: "inline-flex",
                                                             alignItems: "center",
