@@ -1,28 +1,45 @@
-import React, {useState} from "react";
-import {Button, Table, Typography} from "antd";
+import React, {useEffect, useState} from "react";
+import {Button, message, Table, Typography} from "antd";
 import {BranchesOutlined, CheckOutlined} from "@ant-design/icons";
 import {apiRequest} from "../../../utils";
 
 const { Text } = Typography;
 
-const MatrixSelector = ({ component, components = [] }) => {
+const MatrixSelector = ({ components = [] }) => {
     const [selectedCells, setSelectedCells] = useState(new Set());
 
-    const toggleCell = (key) => {
+    useEffect(() => {
+        async function fetchExistingPairs() {
+            try {
+                const res = await apiRequest("getAllComponentPairs");
+                const newSet = new Set(
+                    res.pairs.map((p) => JSON.stringify(p))
+                );
+                setSelectedCells(newSet);
+            } catch (e) {
+                message.error("Errore nel caricamento delle coppie esistenti");
+            }
+        }
+        fetchExistingPairs();
+    }, [components]);
+
+    const toggleCell = (sourceId, targetId) => {
         setSelectedCells((prev) => {
             const newSet = new Set(prev);
+            const key = JSON.stringify({ sourceId, targetId });
             if (newSet.has(key)) newSet.delete(key);
             else newSet.add(key);
             return newSet;
         });
     };
 
-    async function sendSelection(){
-        try{
-            await apiRequest("componentPairs", selectedCells);
-        }
-        catch (e) {
-
+    async function uploadComponentPairs() {
+        try {
+            const pairs = Array.from(selectedCells).map((k) => JSON.parse(k));
+            await apiRequest("uploadComponentPairs", { pairs });
+            message.success("Selezioni inviate con successo!");
+        } catch (e) {
+            message.error("Errore durante l'invio delle selezioni");
         }
     }
 
@@ -47,16 +64,21 @@ const MatrixSelector = ({ component, components = [] }) => {
             key: col.id,
             align: "center",
             render: (_, record) => {
-                const key = `${record.key}-${col.id}`;
-                const rowIndex = data.findIndex(r => r.id === record.key);
-                const colIndex = data.findIndex(c => c.id === col.id);
+                const rowId = record.key;
+                const colId = col.id;
+
+                const rowIndex = data.findIndex((r) => r.id === rowId);
+                const colIndex = data.findIndex((c) => c.id === colId);
 
                 if (colIndex >= rowIndex) return null;
 
-                const isSelected = selectedCells.has(key);
+                const isSelected = selectedCells.has(
+                    JSON.stringify({ sourceId: rowId, targetId: colId })
+                );
+
                 return (
                     <div
-                        onClick={() => toggleCell(key)}
+                        onClick={() => toggleCell(rowId, colId)}
                         style={{
                             cursor: "pointer",
                             padding: "6px 10px",
@@ -67,10 +89,10 @@ const MatrixSelector = ({ component, components = [] }) => {
                             transition: "all 0.15s ease",
                         }}
                     >
-                        {isSelected ? <CheckOutlined/> : "-"}
+                        {isSelected ? <CheckOutlined /> : "-"}
                     </div>
                 );
-            },
+            }
         })),
     ];
 
@@ -85,7 +107,7 @@ const MatrixSelector = ({ component, components = [] }) => {
                     textAlign: "right",
                 }}
             >
-                <Button type='primary'>
+                <Button type='primary' onClick={uploadComponentPairs}>
                     Invia selezioni <BranchesOutlined/>
                 </Button>
             </div>

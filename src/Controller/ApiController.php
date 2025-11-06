@@ -6,6 +6,7 @@ namespace App\Controller;
 
 use App\Document\Component;
 use App\Document\Functionality;
+use App\Document\Pair;
 use App\Document\Process;
 use App\Document\Triplet;
 use App\Document\User;
@@ -343,6 +344,37 @@ class ApiController extends AbstractController
             $allComponentTriplets = array_merge($allComponentTriplets, $triplets);
         }
         return $this->json($allComponentTriplets);
+    }
+
+    #[Route('/api/uploadComponentPairs', methods: ['POST'])]
+    public function uploadComponentPairs(Request $request): Response
+    {
+        $data = json_decode($request->getContent(), true);
+        foreach ($data['pairs'] as $pair) {
+            $exists = $this->documentManager->getRepository(Pair::class)->findBy([
+                'firstComponentId' => $pair['sourceId'],
+                'secondComponentId' => $pair['targetId']
+            ]);
+            if(empty($exists)){
+                $newPair = (new Pair())->setFirstComponentId($pair['sourceId'])->setSecondComponentId($pair['targetId']);
+                $this->documentManager->persist($newPair);
+            }
+        }
+        $this->documentManager->flush();
+        return $this->json([]);
+    }
+
+    #[Route('/api/getAllComponentPairs', methods: ['POST'])]
+    public function getAllComponentPairs(): Response
+    {
+        $pairs = $this->documentManager->getRepository(Pair::class)->findAll();
+
+        $result = array_map(fn($pair) => [
+            'sourceId' => $pair->getFirstComponentId(),
+            'targetId' => $pair->getSecondComponentId(),
+        ], $pairs);
+
+        return $this->json(['pairs' => $result]);
     }
 
 }
