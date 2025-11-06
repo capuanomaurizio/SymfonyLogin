@@ -6,7 +6,7 @@ import { apiRequest } from "../../../utils";
 import { BranchesOutlined, ReloadOutlined } from "@ant-design/icons";
 import FunctionalitiesList from "./FunctionalitiesList";
 
-export default function TripletMatcher({ functionalities, processId, componentId }) {
+export default function TripletMatcher({ functionalities, processId, component }) {
     const [selectedA, setSelectedA] = useState(null);
     const [selectedB, setSelectedB] = useState(null);
     const [selectedC, setSelectedC] = useState(null);
@@ -17,16 +17,16 @@ export default function TripletMatcher({ functionalities, processId, componentId
     useEffect(() => {
         async function loadTriplets() {
             try {
-                const response = await apiRequest("getComponentTriplets", { componentId });
+                const response = await apiRequest("getComponentTriplets", {componentId: component.id});
                 setExistingTriplets(response || []);
             } catch (e) {
                 console.error("Errore nel caricamento triplette:", e);
                 message.error("Impossibile caricare le triplette esistenti");
             }
         }
-        if(componentId)
+        if(component?.id)
             loadTriplets();
-    }, [componentId]);
+    }, [component?.id]);
 
     async function checkIfTripletIsValid() {
         try {
@@ -97,7 +97,7 @@ export default function TripletMatcher({ functionalities, processId, componentId
                     </Col>
                     <Col span={7}>
                         <FunctionalitiesList
-                            title={componentId ? "Funzioni di "+componentId : "Componente non selezionato"}
+                            title={component ? "Funzioni di "+component.name : "Componente non selezionato"}
                             prefix="b"
                             items={functionalities[1] || []}
                             selectedId={selectedB}

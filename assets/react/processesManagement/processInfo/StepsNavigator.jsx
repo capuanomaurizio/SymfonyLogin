@@ -1,6 +1,6 @@
 import {Steps} from "antd";
 
-const StepsNavigator = ({page, setPage}) => {
+const StepsNavigator = ({page, setPage, component}) => {
     return(
         <Steps
             type="navigation"
@@ -19,10 +19,12 @@ const StepsNavigator = ({page, setPage}) => {
                 {
                     status: 'process',
                     title: 'Triplette di funzioni',
+                    description: component?.name || '',
                 },
                 {
                     status: 'process',
                     title: 'Matrice dei componenti',
+                    description: component?.name || '',
                 },
             ]}
         />

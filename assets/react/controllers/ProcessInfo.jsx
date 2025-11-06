@@ -8,13 +8,14 @@ import Components from "../processesManagement/processInfo/treeComponents/Compon
 import FunctionalityDrawer from "../processesManagement/processInfo/treeComponents/componentsDrawers/FunctionalityDrawer";
 import RequirementDrawer from "../processesManagement/processInfo/treeComponents/componentsDrawers/RequirementDrawer";
 import TripletMatcher from "../processesManagement/processInfo/triplets/TripletMatcher";
+import MatrixSelector from "../processesManagement/processInfo/matrix/MatrixSelector";
 
 
 export default function ProcessInfo({ processId }) {
 
     const [process, setProcess] = useState(null);
     const [functionalities, setFunctionalities] = useState([[],[],[]]);
-    const [componentIdForTriplet, setComponentIdForTriplet] = useState(null);
+    const [selectedComponent, setSelectedComponent] = useState(null);
 
     const [page, setPage] = useState(0);
     const [collapsedComponents, setCollapsedComponents] = useState([]);
@@ -49,7 +50,7 @@ export default function ProcessInfo({ processId }) {
 
     return (
         <>
-        <StepsNavigator page={page} setPage={setPage} />
+        <StepsNavigator page={page} setPage={setPage} component={selectedComponent}/>
         {page === 0 ? (
             <ProcessDetails process={process} setProcess={setProcess} />
         ) : page === 1 ? (
@@ -68,7 +69,7 @@ export default function ProcessInfo({ processId }) {
                     setOpenRequirementDrawer={setOpenRequirementDrawer}
                     setPage={setPage}
                     setFunctionalities={setFunctionalities}
-                    setComponentIdForTriplet={setComponentIdForTriplet}
+                    setSelectedComponent={setSelectedComponent}
                 />
                 <ComponentDrawer
                     setProcess={setProcess}
@@ -94,9 +95,9 @@ export default function ProcessInfo({ processId }) {
                 />
             </>
         ) : page === 2 ? (
-            <TripletMatcher functionalities={functionalities} processId={process.id} componentId={componentIdForTriplet}/>
+            <TripletMatcher functionalities={functionalities} processId={process.id} component={selectedComponent} />
         ) : (
-            <></>
+            <MatrixSelector component={selectedComponent} />
         )}
         </>
     );
