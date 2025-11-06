@@ -24,7 +24,8 @@ export default function TripletMatcher({ functionalities, processId, componentId
                 message.error("Impossibile caricare le triplette esistenti");
             }
         }
-        loadTriplets();
+        if(componentId)
+            loadTriplets();
     }, [componentId]);
 
     async function checkIfTripletIsValid() {
