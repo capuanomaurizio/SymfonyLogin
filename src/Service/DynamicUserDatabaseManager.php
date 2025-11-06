@@ -21,9 +21,21 @@ class DynamicUserDatabaseManager extends DocumentManager
     {
         $user = $this->security->getUser();
         if ($user instanceof User) {
-            $dbName = $user?->getAssignedDatabase();
+            $dbName = $user->getAssignedDatabase();
             $config->setDefaultDB($dbName);
         }
         parent::__construct($client, $config, $eventManager);
+    }
+
+    public function getDefaultManager(): DocumentManager
+    {
+        $config = clone $this->getConfiguration();
+        $client = $this->getClient();
+        $eventManager = $this->getEventManager();
+
+        $defaultDb = $_ENV['MONGODB_DB'] ?? $_SERVER['MONGODB_DB'] ?? 'default_db';
+        $config->setDefaultDB($defaultDb);
+
+        return new DocumentManager($client, $config, $eventManager);
     }
 }

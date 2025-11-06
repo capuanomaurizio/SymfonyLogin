@@ -29,13 +29,16 @@ class ApiController extends AbstractController
 
     public function __construct(
         private readonly DocumentManager $documentManager,
+        private DocumentManager $defaultDocumentManager,
         private readonly SerializerInterface $serializer
-    ) {}
+    ) {
+        $this->defaultDocumentManager = $this->documentManager->getDefaultManager();
+    }
 
     #[Route('/api/userslist', methods: ['POST'])]
     public function getUsersList(): JsonResponse
     {
-        $users = $this->documentManager->getRepository(User::class)->findAll();
+        $users = $this->defaultDocumentManager->getRepository(User::class)->findAll();
         return $this->json($users);
     }
 
@@ -43,8 +46,9 @@ class ApiController extends AbstractController
     public function changeUserStatus(Request $request): Response
     {
         $data = $request->getPayload();
-        $user = $this->documentManager->getRepository(User::class)
+        $user = $this->defaultDocumentManager->getRepository(User::class)
             ->findOneBy(['email' => $data->get('email')]);
+        dump($user);
         $userRoles = $user->getRoles();
         if(in_array("UNABLED_USER", $userRoles)){
             $userRoles = array_filter($userRoles, static function ($delete) {
@@ -54,8 +58,8 @@ class ApiController extends AbstractController
             $userRoles[] = "UNABLED_USER";
         }
         $user->setRoles($userRoles);
-        $this->documentManager->persist($user);
-        $this->documentManager->flush();
+        $this->defaultDocumentManager->persist($user);
+        $this->defaultDocumentManager->flush();
         return $this->json($user);
     }
 
@@ -63,14 +67,14 @@ class ApiController extends AbstractController
     public function editUser(Request $request): Response
     {
         $data = $request->getPayload();
-        $user = $this->documentManager->getRepository(User::class)
+        $user = $this->defaultDocumentManager->getRepository(User::class)
             ->findOneBy(['email' => $data->get('email')]);
         $user->setEmail($data->get('email'))
             ->setName($data->get('name'))
             ->setSurname($data->get('surname'))
             ->setRoles($data->all('roles'));
-        $this->documentManager->persist($user);
-        $this->documentManager->flush();
+        $this->defaultDocumentManager->persist($user);
+        $this->defaultDocumentManager->flush();
         return $this->json($user);
     }
 

@@ -8,8 +8,10 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 class DatabaseManager
 {
     public function __construct(
-        private readonly DocumentManager $documentManager
-    ) {}
+        private DocumentManager $documentManager
+    ) {
+        $this->documentManager = $this->documentManager->getDefaultManager();
+    }
 
     public function getUser(string $userId): ?User
     {
