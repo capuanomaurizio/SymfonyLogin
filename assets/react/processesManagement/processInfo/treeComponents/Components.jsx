@@ -150,7 +150,7 @@ const Components = ({process, setProcess, setComponentToEdit, setOpenComponentDr
                 setRequirementToEdit({'component': component, 'functionality': null, 'requirement': null})
                 setOpenRequirementDrawer(true);
             } else if (key === 'expandTriplet') {
-                setPage(3);
+                setPage(2);
                 const parentFuncs = findParentComponent(process.component, component.id)?.functionalities || [];
                 const funcs = component.functionalities || [];
                 const childrenFuncs = getDescendantFunctionalities(component);
