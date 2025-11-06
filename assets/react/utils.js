@@ -75,6 +75,22 @@ export function getDescendantFunctionalities(component) {
     ]);
 }
 
+export function getComponentAndRelatives(targetComponent, rootComponent) {
+    if (!targetComponent || !rootComponent) return [];
+    function findParent(node, parent = null) {
+        if (node.id === targetComponent.id) return parent;
+        for (const child of node.childrenComponents || []) {
+            const result = findParent(child, node);
+            if (result) return result;
+        }
+        return null;
+    }
+    const parent = findParent(rootComponent);
+    const siblings = parent?.childrenComponents?.filter(c => c.id !== targetComponent.id) || [];
+    const children = targetComponent.childrenComponents || [];
+    return [targetComponent, ...siblings, ...children];
+}
+
 export function getAllFunctionalities(component) {
     const ownFuncs = component.functionalities || [];
     if (!component.childrenComponents || component.childrenComponents.length === 0) {

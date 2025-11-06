@@ -15,6 +15,7 @@ export default function ProcessInfo({ processId }) {
 
     const [process, setProcess] = useState(null);
     const [functionalities, setFunctionalities] = useState([[],[],[]]);
+    const [components, setComponents] = useState([])
     const [selectedComponent, setSelectedComponent] = useState(null);
 
     const [page, setPage] = useState(0);
@@ -70,6 +71,7 @@ export default function ProcessInfo({ processId }) {
                     setPage={setPage}
                     setFunctionalities={setFunctionalities}
                     setSelectedComponent={setSelectedComponent}
+                    setComponents={setComponents}
                 />
                 <ComponentDrawer
                     setProcess={setProcess}
@@ -97,7 +99,7 @@ export default function ProcessInfo({ processId }) {
         ) : page === 2 ? (
             <TripletMatcher functionalities={functionalities} processId={process.id} component={selectedComponent} />
         ) : (
-            <MatrixSelector component={selectedComponent} />
+            <MatrixSelector component={selectedComponent} components={components} />
         )}
         </>
     );

@@ -1,6 +1,11 @@
 import {Collapse, ConfigProvider, Dropdown, message, Space, Switch} from "antd";
 import React, {useState} from "react";
-import {apiRequest, findParentComponent, getDescendantFunctionalities} from "../../../utils";
+import {
+    apiRequest,
+    findParentComponent,
+    getComponentAndRelatives,
+    getDescendantFunctionalities
+} from "../../../utils";
 import {
     DeleteOutlined,
     PlusCircleOutlined,
@@ -8,7 +13,7 @@ import {
     FileAddOutlined,
     FunctionOutlined,
     LoginOutlined,
-    BranchesOutlined
+    AimOutlined
 } from "@ant-design/icons";
 import Functionalities from "./Functionalities";
 import Requirements from "./Requirements";
@@ -24,8 +29,8 @@ function filterRoot(component, idToRemove) {
 }
 
 const Components = ({process, setProcess, setComponentToEdit, setOpenComponentDrawer, setParentOfComponentToCreate,
-                        setFunctionalityToEdit, setOpenFunctionalityDrawer, setRequirementToEdit, setOpenRequirementDrawer,
-                        collapsedComponents, setCollapsedComponents, setPage, setFunctionalities, setSelectedComponent}) => {
+                    setFunctionalityToEdit, setOpenFunctionalityDrawer, setRequirementToEdit, setOpenRequirementDrawer,
+                    collapsedComponents, setCollapsedComponents, setPage, setFunctionalities, setSelectedComponent, setComponents}) => {
 
     const [showRequirements, setShowRequirements] = useState(true);
     const [showFunctionalities, setShowFunctionalities] = useState(true);
@@ -129,8 +134,8 @@ const Components = ({process, setProcess, setComponentToEdit, setOpenComponentDr
             },
             {
                 key: 'expandTriplet',
-                label: 'Esporta funzioni',
-                icon: <BranchesOutlined />,
+                label: 'Focus su componente',
+                icon: <AimOutlined />,
             },
         ];
         const handleMenuClick = ({ key, domEvent }) => {
@@ -156,6 +161,7 @@ const Components = ({process, setProcess, setComponentToEdit, setOpenComponentDr
                 const childrenFuncs = getDescendantFunctionalities(component);
                 setSelectedComponent(component);
                 setFunctionalities([parentFuncs, funcs, childrenFuncs]);
+                setComponents(getComponentAndRelatives(component, process.component));
             }
         };
 
