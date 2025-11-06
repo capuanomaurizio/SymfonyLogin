@@ -49,7 +49,7 @@ export default function TripletMatcher({ functionalities, processId, component }
     }
 
     return (
-        <div style={{ padding: 32, background: "#f0f2f5", borderRadius: 10 }}>
+        <div style={{ padding: 16, background: "#f0f2f5", borderRadius: 8 }}>
             <div style={{ marginBottom: 16, display: "flex", justifyContent: 'space-between' }}>
                 <Button
                     onClick={() => {

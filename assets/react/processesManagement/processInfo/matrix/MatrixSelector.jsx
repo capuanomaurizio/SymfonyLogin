@@ -1,6 +1,7 @@
-import React, {useEffect, useState} from "react";
-import { Table, Typography } from "antd";
-import {CheckOutlined} from "@ant-design/icons";
+import React, {useState} from "react";
+import {Button, Table, Typography} from "antd";
+import {BranchesOutlined, CheckOutlined} from "@ant-design/icons";
+import {apiRequest} from "../../../utils";
 
 const { Text } = Typography;
 
@@ -16,12 +17,16 @@ const MatrixSelector = ({ component, components = [] }) => {
         });
     };
 
-    useEffect(() => {
-        console.log(selectedCells)
-    }, [selectedCells]);
+    async function sendSelection(){
+        try{
+            await apiRequest("componentPairs", selectedCells);
+        }
+        catch (e) {
+
+        }
+    }
 
     const data = components;
-
     const dataSource = data.map((row) => ({
         key: row.id,
         label: row.name,
@@ -70,16 +75,31 @@ const MatrixSelector = ({ component, components = [] }) => {
     ];
 
     return (
-        <div style={{ overflowX: "auto", background: "#fff", padding: 16, borderRadius: 8 }}>
-            <Table
-                columns={columns}
-                dataSource={dataSource}
-                pagination={false}
-                bordered
-                size="small"
-                scroll={{ x: "max-content" }}
-            />
-        </div>
+        <>
+            <div
+                style={{
+                    backgroundColor: "#fafafa",
+                    border: "1px solid #f0f0f0",
+                    borderRadius: "8px 8px 0px 0px",
+                    padding: 16,
+                    textAlign: "right",
+                }}
+            >
+                <Button type='primary'>
+                    Invia selezioni <BranchesOutlined/>
+                </Button>
+            </div>
+            <div style={{ overflowX: "auto", background: "#fff", padding: 16, borderRadius: "0px 0px 8px 8px" }}>
+                <Table
+                    columns={columns}
+                    dataSource={dataSource}
+                    pagination={false}
+                    bordered
+                    size="small"
+                    scroll={{ x: "max-content" }}
+                />
+            </div>
+        </>
     );
 };
 
