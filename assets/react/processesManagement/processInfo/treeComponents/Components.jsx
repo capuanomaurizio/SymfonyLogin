@@ -95,7 +95,7 @@ const Components = ({process, setProcess, setComponentToEdit, setOpenComponentDr
             key: component.id,
             label: (
                 <div style={{ display: "flex", alignItems: "center", gap: 8, paddingLeft: !hasChildren && !hasFunctionalities ? 24 : 0, }}>
-                    <span>{component.name}</span>
+                    {component.isFeature ? <em>{component.name}</em> : <span>{component.name}</span>}
                     {componentOptions(component)}
                 </div>
             ),
